@@ -24,12 +24,15 @@
 package com.serenegiant.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -119,18 +122,58 @@ public class UVCService extends BaseService {
 	 */
 	private void showNotification(final CharSequence text) {
 		if (DEBUG) Log.v(TAG, "showNotification:" + text);
-        // Set the info for the views that show in the notification panel.
-        final Notification notification = new Notification.Builder(this)
-			.setSmallIcon(R.drawable.ic_launcher)  // the status icon
-			.setTicker(text)  // the status text
-			.setWhen(System.currentTimeMillis())  // the time stamp
-			.setContentTitle(getText(R.string.app_name))  // the label of the entry
-			.setContentText(text)  // the contents of the entry
-			.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))  // The intent to send when the entry is clicked
-			.build();
+
+//        // Set the info for the views that show in the notification panel.
+//        final Notification notification = new Notification.Builder(this)
+//			.setSmallIcon(R.drawable.ic_launcher)  // the status icon
+//			.setTicker(text)  // the status text
+//			.setWhen(System.currentTimeMillis())  // the time stamp
+//			.setContentTitle(getText(R.string.app_name))  // the label of the entry
+//			.setContentText(text)  // the contents of the entry
+//			.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))  // The intent to send when the entry is clicked
+//			.build();
+//
+//		startForeground(NOTIFICATION, notification);
+//        // Send the notification.
+//		mNotificationManager.notify(NOTIFICATION, notification);
+
+		NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+		Notification notification = null;
+		if(Build.VERSION.SDK_INT >= 26)
+		{
+			//当sdk版本大于26
+			String id = "channel_1";
+			String description = "143";
+			int importance = NotificationManager.IMPORTANCE_LOW;
+			NotificationChannel channel = new NotificationChannel(id, description, importance);
+//                     channel.enableLights(true);
+//                     channel.enableVibration(true);//
+			manager.createNotificationChannel(channel);
+			notification = new Notification.Builder(this, id)
+					.setSmallIcon(R.drawable.ic_launcher)  // the status icon
+					.setTicker(text)  // the status text
+					.setWhen(System.currentTimeMillis())  // the time stamp
+					.setContentTitle(getText(R.string.app_name))  // the label of the entry
+					.setContentText(text)  // the contents of the entry
+					.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))  // The intent to send when the entry is clicked
+					.build();
+		}
+		else
+		{
+			//当sdk版本小于26
+			 notification = new NotificationCompat.Builder(this)
+					.setSmallIcon(R.drawable.ic_launcher)  // the status icon
+				.setTicker(text)  // the status text
+				.setWhen(System.currentTimeMillis())  // the time stamp
+				.setContentTitle(getText(R.string.app_name))  // the label of the entry
+				.setContentText(text)  // the contents of the entry
+				.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))  // The intent to send when the entry is clicked
+				.build();
+
+		}
 
 		startForeground(NOTIFICATION, notification);
-        // Send the notification.
+		// Send the notification.
 		mNotificationManager.notify(NOTIFICATION, notification);
     }
 
