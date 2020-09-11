@@ -2,6 +2,17 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libuvccamera/Android-UVCCamera-libuvccamera.iml" filepath="$PROJECT_DIR$/.idea/modules/libuvccamera/Android-UVCCamera-libuvccamera.iml" group="UVCCamera/libuvccamera" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraCommon/Android-UVCCamera-usbCameraCommon.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraCommon/Android-UVCCamera-usbCameraCommon.iml" group="UVCCamera/usbCameraCommon" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest/Android-UVCCamera-usbCameraTest.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest/Android-UVCCamera-usbCameraTest.iml" group="UVCCamera/usbCameraTest" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest0/Android-UVCCamera-usbCameraTest0.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest0/Android-UVCCamera-usbCameraTest0.iml" group="UVCCamera/usbCameraTest0" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest2/Android-UVCCamera-usbCameraTest2.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest2/Android-UVCCamera-usbCameraTest2.iml" group="UVCCamera/usbCameraTest2" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest3/Android-UVCCamera-usbCameraTest3.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest3/Android-UVCCamera-usbCameraTest3.iml" group="UVCCamera/usbCameraTest3" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest4/Android-UVCCamera-usbCameraTest4.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest4/Android-UVCCamera-usbCameraTest4.iml" group="UVCCamera/usbCameraTest4" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest5/Android-UVCCamera-usbCameraTest5.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest5/Android-UVCCamera-usbCameraTest5.iml" group="UVCCamera/usbCameraTest5" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest6/Android-UVCCamera-usbCameraTest6.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest6/Android-UVCCamera-usbCameraTest6.iml" group="UVCCamera/usbCameraTest6" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest7/Android-UVCCamera-usbCameraTest7.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest7/Android-UVCCamera-usbCameraTest7.iml" group="UVCCamera/usbCameraTest7" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraTest8/Android-UVCCamera-usbCameraTest8.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraTest8/Android-UVCCamera-usbCameraTest8.iml" group="UVCCamera/usbCameraTest8" />
       <module fileurl="file://$PROJECT_DIR$/UVCCamera.iml" filepath="$PROJECT_DIR$/UVCCamera.iml" group="UVCCamera" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/libuvccamera/UVCCamera-libuvccamera.iml" filepath="$PROJECT_DIR$/.idea/modules/libuvccamera/UVCCamera-libuvccamera.iml" group="UVCCamera/libuvccamera" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/usbCameraCommon/UVCCamera-usbCameraCommon.iml" filepath="$PROJECT_DIR$/.idea/modules/usbCameraCommon/UVCCamera-usbCameraCommon.iml" group="UVCCamera/usbCameraCommon" />

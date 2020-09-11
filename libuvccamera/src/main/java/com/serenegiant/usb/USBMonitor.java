@@ -23,16 +23,6 @@
 
 package com.serenegiant.usb;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -51,6 +41,19 @@ import android.util.SparseArray;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
+import java.io.UnsupportedEncodingException;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * USB 设备操作类
+ */
 public final class USBMonitor {
 
 	private static final boolean DEBUG = false;	// TODO set false on production
@@ -78,7 +81,9 @@ public final class USBMonitor {
 	 */
 	private final Handler mAsyncHandler;
 	private volatile boolean destroyed;
+
 	/**
+	 * USB设备状态变更时的回调通知
 	 * USB機器の状態変更時のコールバックリスナー
 	 */
 	public interface OnDeviceConnectListener {
@@ -411,6 +416,7 @@ public final class USBMonitor {
 
 	/**
 	 * request permission to access to USB device
+	 * 连接usb设备要做的第一件事就是获取权限
 	 * @param device
 	 * @return true if fail to request permission
 	 */
@@ -546,6 +552,7 @@ public final class USBMonitor {
 	};
 
 	/**
+	 * 在获取到权限之后继而调用了processConnect方法来尝试建立usb连接
 	 * open specific USB device
 	 * @param device
 	 */
@@ -949,6 +956,8 @@ public final class USBMonitor {
 	}
 
 	/**
+	 * 类主要是用来管理USBMonitor、UsbDevice以及诸如vendorId等参数。
+	 * 在它的构造函数里会调用USBMonitor中mUsbManager的openDevice方法来创建连接。
 	 * control class
 	 * never reuse the instance when it closed
 	 */
