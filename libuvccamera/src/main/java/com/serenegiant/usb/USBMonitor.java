@@ -53,6 +53,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * USB 设备操作类
+ * 常见操作流程
+ * 1 private USBMonitor mUSBMonitor; 声明实例
+ * 2 mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener); 创建实例1）Activity.onCreate()中调用2）传入活动实例3）传入mOnDeviceConnectListener实例
+ * 3 mUSBMonitor.register(); 注册USB设备监听1）Activity.onStart()中调用
+ * 4 mUSBMonitor.unregister(); 反注册USB设备监听1）Activity.onStop()中调用
+ * 5 mUSBMonitor.destroy(); 注销实例1）Activity.onDestroy()中调用
+ * 6 mUSBMonitor = null; 置空实例1）Activity.onDestroy()中调用
  */
 public final class USBMonitor {
 
@@ -417,6 +424,7 @@ public final class USBMonitor {
 	/**
 	 * request permission to access to USB device
 	 * 连接usb设备要做的第一件事就是获取权限
+	 * 初始化（1）
 	 * @param device
 	 * @return true if fail to request permission
 	 */
@@ -427,6 +435,7 @@ public final class USBMonitor {
 			if (device != null) {
 				if (mUsbManager.hasPermission(device)) {
 					// call onConnect if app already has permission
+					//初始化（2）
 					processConnect(device);
 				} else {
 					try {
@@ -553,6 +562,7 @@ public final class USBMonitor {
 
 	/**
 	 * 在获取到权限之后继而调用了processConnect方法来尝试建立usb连接
+	 * 初始化（2）
 	 * open specific USB device
 	 * @param device
 	 */
@@ -567,6 +577,7 @@ public final class USBMonitor {
 				final boolean createNew;
 				ctrlBlock = mCtrlBlocks.get(device);
 				if (ctrlBlock == null) {
+					//初始化（3）
 					ctrlBlock = new UsbControlBlock(USBMonitor.this, device);
 					mCtrlBlocks.put(device, ctrlBlock);
 					createNew = true;
@@ -574,6 +585,7 @@ public final class USBMonitor {
 					createNew = false;
 				}
 				if (mOnDeviceConnectListener != null) {
+					//初始化（5）
 					mOnDeviceConnectListener.onConnect(device, ctrlBlock, createNew);
 				}
 			}
@@ -979,6 +991,7 @@ public final class USBMonitor {
 			if (DEBUG) Log.i(TAG, "UsbControlBlock:constructor");
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
 			mWeakDevice = new WeakReference<UsbDevice>(device);
+			//初始化（4）
 			mConnection = monitor.mUsbManager.openDevice(device);
 			mInfo = updateDeviceInfo(monitor.mUsbManager, device, null);
 			final String name = device.getDeviceName();
