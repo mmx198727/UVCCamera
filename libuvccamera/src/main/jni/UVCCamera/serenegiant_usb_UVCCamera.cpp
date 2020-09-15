@@ -39,6 +39,8 @@
 #include "libUVCCamera.h"
 #include "UVCCamera.h"
 
+#include "./Common/loghelper.h"
+
 /**
  * set the value into the long field
  * @param env: this param should not be null
@@ -118,7 +120,7 @@ jint setField_int(JNIEnv *env, jobject java_obj, const char *field_name, jint va
 }
 
 static ID_TYPE nativeCreate(JNIEnv *env, jobject thiz) {
-
+	LOGOUTD("nativeCreate()");
 	ENTER();
 	UVCCamera *camera = new UVCCamera();
 	setField_long(env, thiz, "mNativePtr", reinterpret_cast<ID_TYPE>(camera));
@@ -128,7 +130,7 @@ static ID_TYPE nativeCreate(JNIEnv *env, jobject thiz) {
 // native側のカメラオブジェクトを破棄
 static void nativeDestroy(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
-
+    LOGOUTD("nativeDestroy()");
 	ENTER();
 	setField_long(env, thiz, "mNativePtr", 0);
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
@@ -144,7 +146,7 @@ static jint nativeConnect(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera,
 	jint vid, jint pid, jint fd,
 	jint busNum, jint devAddr, jstring usbfs_str) {
-
+    LOGOUTD("nativeDestroy()");
 	ENTER();
 	int result = JNI_ERR;
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);

@@ -61,6 +61,8 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
+#include "Common/loghelper.h"
+
 #define UVC_DETACH_ATTACH 0	// set this 1 attach/detach kernel driver by libuvc, set this 0 automatically attach/detach by libusb
 
 int uvc_already_open(uvc_context_t *ctx, struct libusb_device *usb_dev);
@@ -267,6 +269,7 @@ uint8_t uvc_get_device_address(uvc_device_t *dev) {
  * @return Error opening device or SUCCESS
  */
 uvc_error_t uvc_open(uvc_device_t *dev, uvc_device_handle_t **devh) {
+	LOGOUTD("uvc_open()");
 	uvc_error_t ret;
 	struct libusb_device_handle *usb_devh;
 	uvc_device_handle_t *internal_devh;
@@ -368,6 +371,7 @@ fail2:
  * @param info Where to store a pointer to the new info struct
  */
 uvc_error_t uvc_get_device_info(uvc_device_t *dev, uvc_device_info_t **info) {
+	LOGOUTD("uvc_get_device_info()");
 	uvc_error_t ret;
 	uvc_device_info_t *internal_info;
 

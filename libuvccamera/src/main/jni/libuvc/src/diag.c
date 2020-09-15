@@ -45,6 +45,8 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
+#include "Common/loghelper.h"
+
 /** @internal */
 typedef struct _uvc_error_msg {
 	uvc_error_t err;
@@ -252,6 +254,7 @@ static const char *_uvc_name_for_class(const uint8_t clazz) {
 }
 
 static const char *_uvc_name_for_subtype(const uint8_t subtype) {
+	LOGOUTD("_uvc_name_for_subtype()");
 	switch (subtype) {
 	case UVC_VS_UNDEFINED:				// 0x00,
 		return "Undefined(0x00)";

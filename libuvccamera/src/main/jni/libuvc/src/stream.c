@@ -62,6 +62,8 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
+#include "Common/loghelper.h"
+
 uvc_frame_desc_t *uvc_find_frame_desc_stream(uvc_stream_handle_t *strmh,
 		uint16_t format_id, uint16_t frame_id);
 uvc_frame_desc_t *uvc_find_frame_desc(uvc_device_handle_t *devh,
@@ -122,6 +124,7 @@ struct format_table_entry *_get_format_entry(enum uvc_frame_format format) {
 
 static uint8_t _uvc_frame_format_matches_guid(enum uvc_frame_format fmt,
 		uint8_t guid[16]) {
+	LOGOUTD("_uvc_frame_format_matches_guid()");
 	struct format_table_entry *format;
 	int child_idx;
 
@@ -141,6 +144,7 @@ static uint8_t _uvc_frame_format_matches_guid(enum uvc_frame_format fmt,
 }
 
 static enum uvc_frame_format uvc_frame_format_for_guid(uint8_t guid[16]) {
+	LOGOUTD("uvc_frame_format_for_guid()");
 	struct format_table_entry *format;
 	enum uvc_frame_format fmt;
 
@@ -537,6 +541,7 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl, enum uvc_frame_format cf, int width,
 		int height, int min_fps, int max_fps) {
 
+    LOGOUTD("uvc_get_stream_ctrl_format_size_fps()");
 	ENTER();
 
 	uvc_streaming_interface_t *stream_if;
@@ -1379,6 +1384,7 @@ uvc_error_t uvc_stream_start(uvc_stream_handle_t *strmh,
  */
 uvc_error_t uvc_stream_start_bandwidth(uvc_stream_handle_t *strmh,
 		uvc_frame_callback_t *cb, void *user_ptr, float bandwidth_factor, uint8_t flags) {
+	LOGOUTD("uvc_stream_start_bandwidth");
 	/* USB interface we'll be using */
 	const struct libusb_interface *interface;
 	int interface_id;

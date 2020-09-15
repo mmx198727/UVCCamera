@@ -38,6 +38,8 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
+#include "Common/loghelper.h"
+
 /** @internal */
 typedef struct _uvc_error_msg {
   uvc_error_t err;
@@ -121,6 +123,7 @@ void uvc_print_stream_ctrl(uvc_stream_ctrl_t *ctrl, FILE *stream) {
 }
 
 static const char *_uvc_name_for_format_subtype(uint8_t subtype) {
+  LOGOUTD("_uvc_name_for_subtype()");
   switch (subtype) {
   case UVC_VS_FORMAT_UNCOMPRESSED:
     return "UncompressedFormat";

@@ -23,19 +23,21 @@
 
 package com.serenegiant.usb;
 
-import java.util.Locale;
-
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import java.util.Locale;
 
 public class Size implements Parcelable {
 	//
 	/**
+	 * native方面的uvc_raw_format_t的值，主要在libuvc中使用
 	 * native側のuvc_raw_format_tの値, こっちは主にlibuvc用
 	 * 9999 is still image
 	 */
 	public int type;
 	/**
+	 * native方面的raw_frame_t的値, androusb用,
 	 * native側のraw_frame_tの値, androusb用,
 	 * libuvcは対応していない
 	 */

@@ -107,6 +107,9 @@ enum uvc_frame_format {
 	UVC_FRAME_FORMAT_BY8,
 	/** Number of formats understood */
 	UVC_FRAME_FORMAT_COUNT,
+
+	UVC_FRAME_FORMAT_H264,
+	UVC_FRAME_FORMAT_H265,
 };
 
 /* UVC_COLOR_FORMAT_* have been replaced with UVC_FRAME_FORMAT_*. Please use
@@ -123,6 +126,9 @@ enum uvc_frame_format {
 #define UVC_COLOR_FORMAT_MJPEG UVC_FRAME_FORMAT_MJPEG
 #define UVC_COLOR_FORMAT_GRAY8 UVC_FRAME_FORMAT_GRAY8
 
+#define UVC_COLOR_FORMAT_H264 UVC_FRAME_FORMAT_H264
+#define UVC_COLOR_FORMAT_H265 UVC_FRAME_FORMAT_H265
+
 /** VideoStreaming interface descriptor subtype (A.6) */
 enum uvc_vs_desc_subtype {
   UVC_VS_UNDEFINED = 0x00,
@@ -138,7 +144,11 @@ enum uvc_vs_desc_subtype {
   UVC_VS_COLORFORMAT = 0x0d,
   UVC_VS_FORMAT_FRAME_BASED = 0x10,
   UVC_VS_FRAME_FRAME_BASED = 0x11,
-  UVC_VS_FORMAT_STREAM_BASED = 0x12
+  UVC_VS_FORMAT_STREAM_BASED = 0x12,
+  UVC_VS_FORMAT_H264 = 0x13,
+  UVC_VS_FRAME_H264 = 0x14,
+  UVC_VS_FORMAT_H265 = 0x15,
+  UVC_VS_FRAME_H265 = 0x16,
 };
 
 struct uvc_format_desc;
