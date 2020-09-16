@@ -110,9 +110,17 @@ struct format_table_entry *_get_format_entry(enum uvc_frame_format format) {
     	{'B', 'Y', '8', ' ', 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71})
 
 	ABS_FMT(UVC_FRAME_FORMAT_COMPRESSED,
-		{UVC_FRAME_FORMAT_MJPEG})
+		{UVC_FRAME_FORMAT_MJPEG, UVC_FRAME_FORMAT_NV21, UVC_FRAME_FORMAT_NV12, UVC_FRAME_FORMAT_H264, UVC_FRAME_FORMAT_H265})
 	FMT(UVC_FRAME_FORMAT_MJPEG,
 		{'M', 'J', 'P', 'G'})
+	FMT(UVC_FRAME_FORMAT_NV21,
+		{'N', 'V', '2', '1'})
+	FMT(UVC_FRAME_FORMAT_NV12,
+		{'N', 'V', '1', '2'})
+	FMT(UVC_FRAME_FORMAT_H264,
+		{'H', '2', '6', '4'})	
+	FMT(UVC_FRAME_FORMAT_H265,
+		{'H', '2', '6', '5'})	
 
 	default:
 		return NULL;
@@ -552,6 +560,15 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 	uvc_format_desc_t *format;
 	DL_FOREACH(devh->info->stream_ifs, stream_if)
 	{
+		int n = 0;
+		DL_FOREACH(stream_if->format_descs, format)
+		{
+			//输出编号
+			LOGOUTD("DL_FOREACH(stream_if->format_descs, format():%d",n++);
+			//输出视频格式
+			LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
+		}
+
 		DL_FOREACH(stream_if->format_descs, format)
 		{
 			if (!_uvc_frame_format_matches_guid(cf, format->guidFormat))

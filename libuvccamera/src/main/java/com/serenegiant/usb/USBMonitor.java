@@ -974,9 +974,24 @@ public final class USBMonitor {
 	 * never reuse the instance when it closed
 	 */
 	public static final class UsbControlBlock implements Cloneable {
+		/**
+		 *
+		 */
 		private final WeakReference<USBMonitor> mWeakMonitor;
+
+		/**
+		 *
+		 */
 		private final WeakReference<UsbDevice> mWeakDevice;
+
+		/**
+		 *
+		 */
 		protected UsbDeviceConnection mConnection;
+
+		/**
+		 *
+		 */
 		protected final UsbDeviceInfo mInfo;
 		private final int mBusNum;
 		private final int mDevNum;

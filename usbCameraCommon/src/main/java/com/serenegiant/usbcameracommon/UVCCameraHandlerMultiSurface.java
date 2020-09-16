@@ -30,6 +30,9 @@ import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.widget.CameraViewInterface;
 
+/**
+*
+*/
 public class UVCCameraHandlerMultiSurface extends AbstractUVCCameraHandler {
 	/**
 	 * create UVCCameraHandlerMultiSurface, use MediaVideoEncoder, try MJPEG, default bandwidth

@@ -48,6 +48,12 @@ import com.serenegiant.utils.FpsCounter;
  * you can show this view in the center of screen and keep the aspect ratio of content
  * XXX it is better that can set the aspect ratio as xml property
  */
+/**
+ * 在保持指定的纵横比的情况下更改视图大小。
+ * 如果在FrameLayout中使用设置此视图并设置属性 "android:layout_gravity="center"，
+ * 您可以在屏幕中央显示此视图，并保持内容的纵横比
+ * XXX最好能将纵横比设置为xml属性
+ */
 public class UVCCameraTextureView extends AspectRatioTextureView    // API >= 14
 	implements TextureView.SurfaceTextureListener, CameraViewInterface {
 

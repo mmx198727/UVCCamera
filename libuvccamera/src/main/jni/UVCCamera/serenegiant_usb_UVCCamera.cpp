@@ -202,6 +202,8 @@ static jint nativeSetButtonCallback(JNIEnv *env, jobject thiz,
 static jobject nativeGetSupportedSize(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
 
+	LOGOUTD("nativeGetSupportedSize()");
+
 	ENTER();
 	jstring result = NULL;
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);

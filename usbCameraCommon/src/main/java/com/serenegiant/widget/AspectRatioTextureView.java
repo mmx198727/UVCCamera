@@ -33,13 +33,31 @@ import android.view.TextureView;
  * you can show this view in the center of screen and keep the aspect ratio of content
  * XXX it is better that can set the aspect ratio as xml property
  */
+/**
+ * 在保持指定的纵横比的情况下更改视图大小。
+ * 如果在FrameLayout中使用设置此视图并设置属性 "android:layout_gravity="center"，
+ * 您可以在屏幕中央显示此视图，并保持内容的纵横比
+ * XXX最好能将纵横比设置为xml属性
+ *
+ * public interface IAspectRatioView {
+ *     void setAspectRatio(double var1);
+ *     void setAspectRatio(int var1, int var2);
+ *     double getAspectRatio();
+ * }
+ *
+ */
 public class AspectRatioTextureView extends TextureView	// API >= 14
 	implements IAspectRatioView {
 
 	private static final boolean DEBUG = true;	// TODO set false on release
 	private static final String TAG = "AbstractCameraView";
 
+	/**
+	 * 宽高比例
+	 */
     private double mRequestedAspect = -1.0;
+
+
 	private CameraViewInterface.Callback mCallback;
 
 	public AspectRatioTextureView(final Context context) {
@@ -54,6 +72,10 @@ public class AspectRatioTextureView extends TextureView	// API >= 14
 		super(context, attrs, defStyle);
 	}
 
+	/**
+	 * IAspectRatioView接口——设置比例
+	 * @param aspectRatio	宽高比
+	 */
 	@Override
     public void setAspectRatio(final double aspectRatio) {
         if (aspectRatio < 0) {
@@ -65,16 +87,33 @@ public class AspectRatioTextureView extends TextureView	// API >= 14
         }
     }
 
+	/**
+	 * IAspectRatioView接口——设置宽高比例
+	 * 实际调用 void setAspectRatio(final double aspectRatio)
+	 * @param width		宽度
+	 * @param height 	高度
+	 */
 	@Override
     public void setAspectRatio(final int width, final int height) {
 		setAspectRatio(width / (double)height);
     }
 
+	/**
+	 * IAspectRatioView接口——获取宽高比例
+	 * @return
+	 */
 	@Override
 	public double getAspectRatio() {
 		return mRequestedAspect;
 	}
 
+	/**
+	 * onMeasure方法的作用是测量控件的大小，
+	 * 当我们创建一个View(执行构造方法)的时候不需要测量控件的大小，
+	 * 只有将这个view放入一个容器（父控件）中的时候才需要测量，而这个测量方法就是父控件唤起调用的。
+	 * @param widthMeasureSpec
+	 * @param heightMeasureSpec
+	 */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 

@@ -28,6 +28,12 @@ import android.app.Activity;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.widget.CameraViewInterface;
 
+/**
+ * 摄像头操作类
+ * （1）继承自AbstractUVCCameraHandler，因此实际上是一个Handler
+ * （2）创建线程 CameraThread 对象在 AbstractUVCCameraHandler构造函数中使用，并start()
+ *
+*/
 public class UVCCameraHandler extends AbstractUVCCameraHandler {
 
 	/**
