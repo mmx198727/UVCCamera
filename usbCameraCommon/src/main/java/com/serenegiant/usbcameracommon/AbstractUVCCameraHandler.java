@@ -188,7 +188,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	private final WeakReference<AbstractUVCCameraHandler.CameraThread> mWeakThread;
 
 	/**
-	 *
+	 * 是否已经释放
 	 */
 	private volatile boolean mReleased;
 
@@ -531,6 +531,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	/**
 	 * 摄像头操作线程
 	 *
+	 * 2 继承方法
+	 * run()，Thread方法重写
+	 * finalize()，Object方法重写
+	 *
 	 * 3 CameraCallback 触发
 	 * （1）callOnOpen
 	 * （2）callOnClose
@@ -555,7 +559,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 
 		/**
 		 * 记录拥有 CameraThread 对象的 AbstractUVCCameraHandler 对象
-		 * 构造函数赋值
+		 * 在构造函数赋值
 		 * 注意：
 		 * Class<? extends T> 这个是定义参数的类型为Class，
 		 * 但是这个Class必须是和之前定义的泛型有继承关系的。
@@ -565,13 +569,24 @@ abstract class AbstractUVCCameraHandler extends Handler {
 
 		/**
 		 * 记录Activity对象
-		 * 构造函数赋值
-		 *
+		 * 在构造函数赋值
+		 * 注意：
+		 * weak reference 弱引用
 		 */
 		private final WeakReference<Activity> mWeakParent;
 
+		/**
+		 * 记录保持宽高比例窗口接口对象
+		 * 在构造函数赋值
+		 */
 		private final WeakReference<CameraViewInterface> mWeakCameraView;
 
+		/**
+		 * Encoder对象创建类型（工厂模式）
+		 * 0: use MediaSurfaceEncoder,
+		 * 1: use MediaVideoEncoder,
+		 * 2: use MediaVideoBufferEncoder
+		 */
 		private final int mEncoderType;
 
 		/**
@@ -579,6 +594,12 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		 */
 		private final Set<CameraCallback> mCallbacks = new CopyOnWriteArraySet<CameraCallback>();
 
+		/**
+		 * mWidth 视频宽度
+		 * mHeight 视频高度
+		 * mPreviewMode 视频格式 either UVCCamera.FRAME_FORMAT_YUYV(0) or UVCCamera.FRAME_FORMAT_MJPEG(1)
+		 * 在构造函数赋值
+		 */
 		private int mWidth, mHeight, mPreviewMode;
 		private float mBandwidthFactor;
 		private boolean mIsPreviewing;
@@ -598,6 +619,8 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		 * muxer for audio/video recording
 		 */
 		private MediaMuxerWrapper mMuxer;
+
+
 		private MediaVideoBufferEncoder mVideoEncoder;
 
 		/**
@@ -628,6 +651,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			loadShutterSound(parent);
 		}
 
+		/**
+		 * finalize()方法是Object类中提供的一个方法，在GC准备释放对象所占用的内存空间之前，它将首先调用finalize()方法
+		 * @throws Throwable
+		 */
 		@Override
 		protected void finalize() throws Throwable {
 			Log.i(TAG, "CameraThread#finalize");

@@ -29,6 +29,16 @@ import android.view.Surface;
 
 import com.serenegiant.encoder.IVideoEncoder;
 
+/**
+ * 摄像头预览控件接口
+ *
+ * 保持窗口宽高比例接口 IAspectRatioView
+ * public interface IAspectRatioView {
+ *     void setAspectRatio(double var1);
+ *     void setAspectRatio(int var1, int var2);
+ *     double getAspectRatio();
+ * }
+ */
 public interface CameraViewInterface extends IAspectRatioView {
 	public interface Callback {
 		public void onSurfaceCreated(CameraViewInterface view, Surface surface);
