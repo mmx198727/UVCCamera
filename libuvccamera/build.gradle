@@ -53,6 +53,11 @@ android {
 			jni.srcDirs = []
 		}
 	}
+    externalNativeBuild {
+        ndkBuild {
+            path file('src/main/jni/Android.mk')
+        }
+    }
 }
 
 tasks.withType(JavaCompile) {
