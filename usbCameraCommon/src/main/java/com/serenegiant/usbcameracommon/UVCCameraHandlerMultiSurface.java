@@ -31,7 +31,7 @@ import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.widget.CameraViewInterface;
 
 /**
-*
+* 在Demo 6 中 使用
 */
 public class UVCCameraHandlerMultiSurface extends AbstractUVCCameraHandler {
 	/**

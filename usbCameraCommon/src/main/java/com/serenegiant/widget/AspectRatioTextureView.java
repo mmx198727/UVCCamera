@@ -39,6 +39,7 @@ import android.view.TextureView;
  * 您可以在屏幕中央显示此视图，并保持内容的纵横比
  * XXX最好能将纵横比设置为xml属性
  *
+ * 继承接口
  * public interface IAspectRatioView {
  *     void setAspectRatio(double var1);
  *     void setAspectRatio(int var1, int var2);

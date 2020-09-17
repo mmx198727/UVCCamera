@@ -560,11 +560,8 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 	uvc_format_desc_t *format;
 	DL_FOREACH(devh->info->stream_ifs, stream_if)
 	{
-		int n = 0;
 		DL_FOREACH(stream_if->format_descs, format)
 		{
-			//输出编号
-			LOGOUTD("DL_FOREACH(stream_if->format_descs, format():%d",n++);
 			//输出视频格式
 			LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
 		}

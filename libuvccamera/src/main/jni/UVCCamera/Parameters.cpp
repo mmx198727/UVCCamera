@@ -346,6 +346,8 @@ char *UVCDiags::getCurrentStream(const uvc_stream_ctrl_t *ctrl) {
 }
 
 char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
+	LOGOUTD("UVCDiags::getSupportedSize()");
+
 	StringBuffer buffer;
 	Writer<StringBuffer> writer(buffer);
 	char buf[256];
@@ -366,11 +368,18 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 				uvc_frame_desc_t *frame_desc;
 				DL_FOREACH(stream_if->format_descs, fmt_desc)
 				{
+					//输出视频格式
+					LOGOUTD("UVCDiags::getSupportedSize() fmt_desc->guidFormat:%c %c %c %c",fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3])
+					LOGOUTD("UVCDiags::getSupportedSize() fmt_desc->bDescriptorSubtype:%x",fmt_desc->bDescriptorSubtype);
 					writer.StartObject();
 					{
 						switch (fmt_desc->bDescriptorSubtype) {
 						case UVC_VS_FORMAT_UNCOMPRESSED:
 						case UVC_VS_FORMAT_MJPEG:
+						case UVC_VS_FORMAT_H264:
+						case UVC_VS_FORMAT_H265:
+						case UVC_VS_FORMAT_NV12:
+						case UVC_VS_FORMAT_NV21:
 							write(writer, "index", fmt_desc->bFormatIndex);
 							write(writer, "type", fmt_desc->bDescriptorSubtype);
 							write(writer, "default", fmt_desc->bDefaultFrameIndex);

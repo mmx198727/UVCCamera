@@ -64,60 +64,89 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
-* AbstractUVCCameraHandler 是一个 Handler，在其内部是通过Android的消息机制来管理整个相机的生命周期。
+* AbstractUVCCameraHandler 是一个 Handler，在其内部是通过 Android 的消息机制来管理整个相机的生命周期。
+* （1）Handler（AbstractUVCCameraHandler） 创建在子线程（CameraThread） 中；
+* （2）子线程（CameraThread）对象通过 AbstractUVCCameraHandler 构造函数传入 并在外部 start(开始线程)；
+* （3）AbstractUVCCameraHandler实际上不直接使用，一般使用其子类 UVCCameraHandler
+* 注：UVCCameraHandler构造函数创建子线程（CameraThread），传入父类构造函数，并开始线程（start）
+*
 * 1 void handleMessage(Message msg):处理消息
-*  （1）MSG_OPEN = 0;
-*  （2）MSG_CLOSE = 1;
-*  （3）MSG_PREVIEW_START = 2;
-*  （4）MSG_PREVIEW_STOP = 3;
-*  （5）MSG_CAPTURE_STILL = 4;
-*  （6）MSG_CAPTURE_START = 5;
-*  （7）MSG_CAPTURE_STOP = 6;
-*  （8）MSG_MEDIA_UPDATE = 7;
-*  （9）MSG_RELEASE = 9;
-*   注意：（8）（9）实际上Demo未使用
+* （1）MSG_OPEN = 0;				打开摄像头
+* （2）MSG_CLOSE = 1;			关闭摄像头
+* （3）MSG_PREVIEW_START = 2;	开始预览
+* （4）MSG_PREVIEW_STOP = 3;		停止预览
+* （5）MSG_CAPTURE_STILL = 4;	拍照
+* （6）MSG_CAPTURE_START = 5;	开始录制
+* （7）MSG_CAPTURE_STOP = 6;		停止录制
+* （8）MSG_MEDIA_UPDATE = 7;		刷新媒体库
+* （9）MSG_RELEASE = 9;			释放资源
+*  注意：（8）（9）实际上Demo未使用
 *
 * 2 在handleMessage()方法中调用CameraThread处理摄像头
-*  （1）CameraThread是内部类
-*  （2）CameraThread调用UVCCamera实现摄像头控制
-*  （3）CameraThread会触发回调CameraCallback（实际上Demo未涉及）
+* （1）CameraThread是内部类
+* （2）CameraThread调用UVCCamera实现摄像头控制
+* （3）CameraThread会触发回调CameraCallback（实际上Demo未涉及）
 *
 * 3 摄像头操作方法
-*  提供方法触发消息（sendMessage)
-*  （1）open()
-*  （2）close()
-*  （3）startPreview()
-*  （4）stopPreview()
-*  （5）captureStill()
-*  （6）startRecording()
-*  （7）stopRecording()
-*  （8）updateMedia()
-*  （9）release()
-*  注意：可以看出与消息对等，实际上是进行了封装，使得消息本身对外透明，用户之间使用方法
+* 提供方法触发消息（sendMessage)
+* （1）open()			打开摄像头
+* （2）close()			关闭摄像头
+* （3）startPreview()	开始预览
+* （4）stopPreview()		停止预览
+* （5）captureStill()	拍照
+* （6）startRecording()	开始录制
+* （7）stopRecording()	停止录制
+* （8）updateMedia()		刷新媒体库
+* （9）release()			释放资源
+* 注意：可以看出与消息对等，实际上是进行了封装，使得消息本身对外透明，用户之间使用方法
 *
-* 4 状态方法
-*  （1）getWidth()
-*  （2）getHeight()
-*  （3）isOpened()
-*  （4）isPreviewing()
-*  （5）isRecording()
-*  （6）isEqual()
-*  （7）isCameraThread()
-*  （8）isReleased()
-*  （9）checkReleased()
+* 4 摄像头属性设置（如亮度或对比度）
+* （1）checkSupportFlag() 询问是否支持属性设置
+* （2）getValue()		  获取属性
+* （3）setValue()		  设置属性
+* （4）resetValue()		  重置属性
 *
-* 5 摄像头生命周期回调注册方法
-*  （1）addCallback()
-*  （2）removeCallback()
+* 5 属性方法
+* （1）getWidth()		获取摄像头宽度
+* （2）getHeight()		获取摄像头高度
+* （3）isOpened()		摄像头是否开启
+* （4）isPreviewing()	摄像头是否开始预览
+* （5）isRecording()		摄像头是否开始录制
+* （6）isEqual()			是否为同一个设备
+* （7）isCameraThread()	是否开启线程
+* （8）isReleased()		释放资源
+* （9）checkReleased()	检测是否释放资源
 *
-* 参考资料——Handler的相关方法
-*  （1） void handleMessage(Message msg):处理消息的方法,通常是用于被重写!
-*  （2） sendEmptyMessage(int what):发送空消息
-*  （3） sendEmptyMessageDelayed(int what,long delayMillis):指定延时多少毫秒后发送空信息
-*  （4） sendMessage(Message msg):立即发送信息
-*  （5） sendMessageDelayed(Message msg):指定延时多少毫秒后发送信息
-*  （6） final boolean hasMessage(int what):检查消息队列中是否包含what属性为指定值的消息 如果是参数为(int what,Object object):除了判断what属性,还需要判断Object属性是否为指定对象的消息
-*/
+* 6 摄像头生命周期回调注册方法
+* （1）addCallback()		添加生命周期回调注册
+* （2）removeCallback()	移除声明周期回调注册
+* 摄像头生命周期回调使用方式：
+* （1） 继承 CameraCallback接口，处理生命周期；
+* （2） 调用 addCallback()方法传入对象；
+* （3） 触发过程
+* 	AbstractUVCCameraHandler摄像头操作方法 ->
+* 	AbstractUVCCameraHandler.SendMessage() ->
+* 	AbstractUVCCameraHandler.handleMessage() ->
+* 	CameraThread 摄像头操作方法 ->
+* 	调用CameraCallback 方法触发回调过程；
+*
+* 7 参考资料
+* （1） Handler相关方法
+*  	1） void handleMessage(Message msg):处理消息的方法,通常是用于被重写!
+*  	2） sendEmptyMessage(int what):发送空消息
+*  	3） sendEmptyMessageDelayed(int what,long delayMillis):指定延时多少毫秒后发送空信息
+*  	4） sendMessage(Message msg):立即发送信息
+*  	5） sendMessageDelayed(Message msg):指定延时多少毫秒后发送信息
+*   6） final boolean hasMessage(int what):检查消息队列中是否包含what属性为指定值的消息 如果是参数为(int what,Object object):除了判断what属性,还需要判断Object属性是否为指定对象的消息
+ *
+ * （2） Handler写在子线程中
+ * 如果是Handler写在了子线程中的话,我们就需要自己创建一个Looper对象了!
+ * 创建的流程如下:
+ * 	1） 直接调用Looper.prepare()方法即可为当前线程创建Looper对象,而它的构造器会创建配套的MessageQueue;
+ *  2） 创建Handler对象,重写handleMessage( )方法就可以处理来自于其他线程的信息了!
+ *  3） 调用Looper.loop()方法启动Looper
+ *
+ */
 abstract class AbstractUVCCameraHandler extends Handler {
 	private static final boolean DEBUG = true;	// TODO set false on release
 	private static final String TAG = "AbsUVCCameraHandler";
@@ -127,13 +156,13 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	 * 在CameraThread中触发
 	 */
 	public interface CameraCallback {
-		public void onOpen();
-		public void onClose();
-		public void onStartPreview();
-		public void onStopPreview();
-		public void onStartRecording();
-		public void onStopRecording();
-		public void onError(final Exception e);
+		public void onOpen();					/** 打开摄像头 */
+		public void onClose();  				/** 关闭摄像头 */
+		public void onStartPreview();   		/** 开始预览 */
+		public void onStopPreview();			/** 停止预览 */
+		public void onStartRecording();			/** 开始录像 */
+		public void onStopRecording();			/** 停止录像 */
+		public void onError(final Exception e);	/** 返回错误码 */
 	}
 
 	/**
@@ -203,7 +232,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-获取宽度
+	 * 属性方法-获取宽度
 	 * @return
 	 */
 	public int getWidth() {
@@ -212,7 +241,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-获取高度
+	 * 属性方法-获取高度
 	 * @return
 	 */
 	public int getHeight() {
@@ -221,7 +250,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-是否开启
+	 * 属性方法-是否开启
 	 * @return
 	 */
 	public boolean isOpened() {
@@ -230,7 +259,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-是否在预览
+	 * 属性方法-是否在预览
 	 * @return
 	 */
 	public boolean isPreviewing() {
@@ -239,7 +268,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-是否自录像
+	 * 属性方法-是否自录像
 	 * @return
 	 */
 	public boolean isRecording() {
@@ -248,7 +277,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-判断是否同一个设备
+	 * 属性方法-判断是否同一个设备
 	 * @return
 	 */
 	public boolean isEqual(final UsbDevice device) {
@@ -257,7 +286,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-是否开启线程
+	 * 属性方法-是否开启线程
 	 * @return
 	 */
 	protected boolean isCameraThread() {
@@ -266,7 +295,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-是否释放
+	 * 属性方法-是否释放
 	 * @return
 	 */
 	protected boolean isReleased() {
@@ -275,7 +304,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 状态方法-检查是否释放
+	 * 属性方法-检查是否释放
 	 * @return
 	 */
 	protected void checkReleased() {
@@ -395,7 +424,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 添加 CameraCallback
+	 * 摄像头生命周期回调注册方法—注册
 	 * @param callback
 	 */
 	public void addCallback(final CameraCallback callback) {
@@ -409,7 +438,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	}
 
 	/**
-	 * 移除 CameraCallback
+	 * 摄像头生命周期回调注册方法—注销
 	 * @param callback
 	 */
 	public void removeCallback(final CameraCallback callback) {
@@ -421,16 +450,30 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		}
 	}
 
+	/**
+	 * 摄像头操作方法-更新媒体库
+	 * @param path
+	 */
 	protected void updateMedia(final String path) {
 		sendMessage(obtainMessage(MSG_MEDIA_UPDATE, path));
 	}
 
+	/**
+	 * 摄像头属性设置—询问是否支持属性设置
+	 * @param flag 如 亮度设置， PU_BRIGHTNESS，在UVCCamera.java中定义
+	 * @return
+	 */
 	public boolean checkSupportFlag(final long flag) {
 		checkReleased();
 		final CameraThread thread = mWeakThread.get();
 		return thread != null && thread.mUVCCamera != null && thread.mUVCCamera.checkSupportFlag(flag);
 	}
 
+	/**
+	 * 摄像头属性设置—获取属性
+	 * @param flag 如 亮度设置， PU_BRIGHTNESS，在UVCCamera.java中定义
+	 * @return
+	 */
 	public int getValue(final int flag) {
 		checkReleased();
 		final CameraThread thread = mWeakThread.get();
@@ -445,6 +488,12 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		throw new IllegalStateException();
 	}
 
+	/**
+	 * 摄像头属性设置—设置属性
+	 * @param flag 如 亮度设置， PU_BRIGHTNESS，在UVCCamera.java中定义
+	 * @param value 需要设置的值
+	 * @return
+	 */
 	public int setValue(final int flag, final int value) {
 		checkReleased();
 		final CameraThread thread = mWeakThread.get();
@@ -461,6 +510,11 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		throw new IllegalStateException();
 	}
 
+	/**
+	 * 摄像头属性设置—重置属性
+	 * @param flag 如 亮度设置， PU_BRIGHTNESS，在UVCCamera.java中定义
+	 * @return
+	 */
 	public int resetValue(final int flag) {
 		checkReleased();
 		final CameraThread thread = mWeakThread.get();
@@ -531,29 +585,78 @@ abstract class AbstractUVCCameraHandler extends Handler {
 	/**
 	 * 摄像头操作线程
 	 *
-	 * 2 继承方法
-	 * run()，Thread方法重写
-	 * finalize()，Object方法重写
+	 * 1 属性方法
+	 * （1）getHandler()				获取绑定的 AbstractUVCCameraHandler 对象
+	 * （2）getWidth()				获取摄像头宽度
+	 * （3）getHeight()				获取摄像头高度
+	 * （4）isCameraOpened()			摄像头是否已开启
+	 * （5）isPreviewing()			摄像头是否正在预览
+	 * （6）isRecording()			摄像头是否正在录制
+	 * （7）isEqual()				是否为同一个设备
+	 * 注意：直接在 AbstractUVCCameraHandler中调用
 	 *
-	 * 3 CameraCallback 触发
-	 * （1）callOnOpen
-	 * （2）callOnClose
-	 * （3）callOnStartPreview
-	 * （4）callOnStopPreview
-	 * （5）callOnStartRecording
-	 * （6）callOnStopRecording
-	 * （7）callOnError
+	 * 2 摄像头控制方法
+	 * （1）handleOpen()				打开摄像头
+	 * （2）handleClose()			关闭摄像头
+	 * （3）handleStartPreview()		开始预览
+	 * （4）handleStopPreview()		停止预览
+	 * （5）handleCaptureStill()		拍照
+	 * （6）handleStartRecording()	开始录制
+	 * （7）handleStopRecording()	停止录制
+	 * （8）handleUpdateMedia()		刷新媒体库
+	 * （9）handleRelease()			释放资源
+	 * 注意：
+	 * （1）调用UVCCamera实现摄像头控制
+	 * （2）在同名方法中会触发CameraCallback，如handleOpen()触发callOnOpen()
+	 * （3）在AbstractUVCCameraHandler handleMessage()直接调用，接收到消息
 	 *
-	 * 4 Android中Thread的三种使用方式：
+	 * 3 继承方法
+	 * （1）run()，Thread方法重写
+	 * （2）finalize()，Object方法重写，GC释放资源时调用
+	 *
+	 * 4 触发 CameraCallback
+	 * （1）callOnOpen()				打开摄像头触发CameraCallback.onOpen()
+	 * （2）callOnClose()			关闭摄像头触发CameraCallback.onClose()
+	 * （3）callOnStartPreview()		开始预览触发CameraCallback.onStartPreview()
+	 * （4）callOnStopPreview()		停止预览触发CameraCallback.onStopPreview()
+	 * （5）callOnStartRecording()	开始录像触发CameraCallback.onStartRecording()
+	 * （6）callOnStopRecording()	停止录像触发CameraCallback.onStopRecording()
+	 * （7）callOnError()			返回错误码触发CameraCallback.onError(final Exception e)
+	 *
+	 * 5 变量
+	 * （1）mSync
+	 * （2）mHandlerClass
+	 * （3）mWeakParent
+	 * （4）mWeakCameraView
+	 * （5）mEncoderType
+	 * （6）mCallbacks
+	 * （7）mWidth, mHeight, mPreviewMode
+	 * （8）mBandwidthFactor
+	 * （9）mIsPreviewing
+	 * （10）mIsRecording
+	 * （11）mSoundPool
+	 * （12）mSoundId
+	 * （13）mHandler
+	 * （14）mUVCCamera
+	 * （15）mMuxer
+	 * （16）mVideoEncoder
+	 * （17）mIFrameCallback
+	 * （18）mMediaEncoderListener
+	 *
+	 * 6相关资料
+	 * 6.1 Android中Thread的三种使用方式：
 	 * （1）继承Thread，重写run()方法。
 	 * （2）实现Runnable，重写run()方法来执行任务。
 	 * （3）通过Handler启动线程。
+	 *
+	 * 6.2 MediaScannerConnection
+	 * MediaScannerConnection 作用是为应用提供一个媒体扫描服务，当有新创建或者下载的文件时，会从该文件读取元数据并将该文件添加到媒体中去。
 	 */
 	static final class CameraThread extends Thread {
 		private static final String TAG_THREAD = "CameraThread";
 		/**
-		 * 互斥量
-		 * 注意：在外部调用（AbstractUVCCameraHandler）
+		 * 异步互斥量
+		 * 在线程中访问资源
 		 */
 		private final Object mSync = new Object();
 
@@ -601,36 +704,60 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		 * 在构造函数赋值
 		 */
 		private int mWidth, mHeight, mPreviewMode;
+
+		/**
+		 * UVCCamera
+		 * 在构造函数赋值
+		 */
 		private float mBandwidthFactor;
+
+		/**
+		 * 是否正在预览
+		 */
 		private boolean mIsPreviewing;
+
+		/**
+		 * 是否正在录像
+		 */
 		private boolean mIsRecording;
 
 		/**
+		 * 拍照音频
 		 * shutter sound
 		 */
 		private SoundPool mSoundPool;
 		private int mSoundId;
+
+		/**
+		 * 通过反射创建的的对象
+		 */
 		private AbstractUVCCameraHandler mHandler;
+
 		/**
 		 * for accessing UVC camera
 		 */
 		private UVCCamera mUVCCamera;
+
 		/**
+		 * 视频录制
 		 * muxer for audio/video recording
 		 */
 		private MediaMuxerWrapper mMuxer;
 
-
+		/**
+		 * 视频编码器
+		 * 视频录制使用
+		 */
 		private MediaVideoBufferEncoder mVideoEncoder;
 
 		/**
-		 *
+		 * 构造函数
 		 * @param clazz Class extends AbstractUVCCameraHandler
 		 * @param parent parent Activity
 		 * @param cameraView for still capturing
 		 * @param encoderType 0: use MediaSurfaceEncoder, 1: use MediaVideoEncoder, 2: use MediaVideoBufferEncoder
-		 * @param width
-		 * @param height
+		 * @param width 视频宽度
+		 * @param height 视频高度
 		 * @param format either FRAME_FORMAT_YUYV(0) or FRAME_FORMAT_MJPEG(1)
 		 * @param bandwidthFactor
 		 */
@@ -648,10 +775,12 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			mBandwidthFactor = bandwidthFactor;
 			mWeakParent = new WeakReference<Activity>(parent);
 			mWeakCameraView = new WeakReference<CameraViewInterface>(cameraView);
+			//加载音频
 			loadShutterSound(parent);
 		}
 
 		/**
+		 * Object.finalize()方法
 		 * finalize()方法是Object类中提供的一个方法，在GC准备释放对象所占用的内存空间之前，它将首先调用finalize()方法
 		 * @throws Throwable
 		 */
@@ -661,6 +790,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			super.finalize();
 		}
 
+		/**
+		 * 属性方法——获取绑定的 AbstractUVCCameraHandler 对象
+		 * @return
+		 */
 		public AbstractUVCCameraHandler getHandler() {
 			if (DEBUG) Log.v(TAG_THREAD, "getHandler:");
 			synchronized (mSync) {
@@ -673,40 +806,69 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			return mHandler;
 		}
 
+		/**
+		 * 属性方法——获取摄像头宽度
+		 * @return
+		 */
 		public int getWidth() {
 			synchronized (mSync) {
 				return mWidth;
 			}
 		}
 
+		/**
+		 * 属性方法——获取摄像头高度
+		 * @return
+		 */
 		public int getHeight() {
 			synchronized (mSync) {
 				return mHeight;
 			}
 		}
 
+		/**
+		 * 属性方法——摄像头是否已开启
+		 * @return
+		 */
 		public boolean isCameraOpened() {
 			synchronized (mSync) {
 				return mUVCCamera != null;
 			}
 		}
 
+		/**
+		 * 属性方法——摄像头是否正在预览
+		 * @return
+		 */
 		public boolean isPreviewing() {
 			synchronized (mSync) {
 				return mUVCCamera != null && mIsPreviewing;
 			}
 		}
 
+		/**
+		 * 属性方法——摄像头是否正在录制
+		 * @return
+		 */
 		public boolean isRecording() {
 			synchronized (mSync) {
 				return (mUVCCamera != null) && (mMuxer != null);
 			}
 		}
 
+		/**
+		 * 属性方法——是否为同一个设备
+		 * @param device
+		 * @return
+		 */
 		public boolean isEqual(final UsbDevice device) {
 			return (mUVCCamera != null) && (mUVCCamera.getDevice() != null) && mUVCCamera.getDevice().equals(device);
 		}
 
+		/**
+		 * 摄像头控制方法——打开摄像头
+		 * @param ctrlBlock
+		 */
 		public void handleOpen(final USBMonitor.UsbControlBlock ctrlBlock) {
 			if (DEBUG) Log.v(TAG_THREAD, "handleOpen:");
 			handleClose();
@@ -723,6 +885,9 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			if (DEBUG) Log.i(TAG, "supportedSize:" + (mUVCCamera != null ? mUVCCamera.getSupportedSize() : null));
 		}
 
+		/**
+		 * 摄像头控制方法——关闭摄像头
+		 */
 		public void handleClose() {
 			if (DEBUG) Log.v(TAG_THREAD, "handleClose:");
 			handleStopRecording();
@@ -738,6 +903,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			}
 		}
 
+		/**
+		 * 摄像头控制方法——开始预览
+		 * @param surface
+		 */
 		public void handleStartPreview(final Object surface) {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStartPreview:");
 			if ((mUVCCamera == null) || mIsPreviewing) return;
@@ -767,6 +936,9 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			callOnStartPreview();
 		}
 
+		/**
+		 * 摄像头控制方法——停止预览
+		 */
 		public void handleStopPreview() {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStopPreview:");
 			if (mIsPreviewing) {
@@ -782,6 +954,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStopPreview:finished");
 		}
 
+		/**
+		 * 摄像头控制方法——拍照
+		 * @param path
+		 */
 		public void handleCaptureStill(final String path) {
 			if (DEBUG) Log.v(TAG_THREAD, "handleCaptureStill:");
 			final Activity parent = mWeakParent.get();
@@ -811,6 +987,9 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			}
 		}
 
+		/**
+		 * 摄像头控制方法——开始录制
+		 */
 		public void handleStartRecording() {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStartRecording:");
 			try {
@@ -849,6 +1028,9 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			}
 		}
 
+		/**
+		 * 摄像头控制方法——停止录制
+		 */
 		public void handleStopRecording() {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStopRecording:mMuxer=" + mMuxer);
 			final MediaMuxerWrapper muxer;
@@ -874,7 +1056,8 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		}
 
 		/**
-		 * 录像时帧回调处理
+		 * 录制时帧回调处理
+		 * UVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_NV21);
 		 */
 		private final IFrameCallback mIFrameCallback = new IFrameCallback() {
 			@Override
@@ -890,6 +1073,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			}
 		};
 
+		/**
+		 * 摄像头控制方法——刷新媒体库
+		 * @param path
+		 */
 		public void handleUpdateMedia(final String path) {
 			if (DEBUG) Log.v(TAG_THREAD, "handleUpdateMedia:path=" + path);
 			final Activity parent = mWeakParent.get();
@@ -911,6 +1098,9 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			}
 		}
 
+		/**
+		 * 摄像头控制方法——释放资源
+		 */
 		public void handleRelease() {
 			if (DEBUG) Log.v(TAG_THREAD, "handleRelease:mIsRecording=" + mIsRecording);
 			handleClose();
@@ -922,6 +1112,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			if (DEBUG) Log.v(TAG_THREAD, "handleRelease:finished");
 		}
 
+		/**
+		 * 视频编码器
+		 * new MediaVideoEncoder(muxer, getWidth(), getHeight(), mMediaEncoderListener);
+		 */
 		private final MediaEncoder.MediaEncoderListener mMediaEncoderListener = new MediaEncoder.MediaEncoderListener() {
 			@Override
 			public void onPrepared(final MediaEncoder encoder) {
@@ -972,6 +1166,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		};
 
 		/**
+		 * 加载拍照音效
 		 * prepare and load shutter sound for still image capturing
 		 */
 		@SuppressWarnings("deprecation")
@@ -997,6 +1192,10 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		    mSoundId = mSoundPool.load(context, R.raw.camera_click, 1);
 		}
 
+		/**
+		 * Thread.run()方法
+		 * 线程核心逻辑
+		 */
 		@Override
 		public void run() {
 			Log.d(TAG, "run: ");
@@ -1019,6 +1218,8 @@ abstract class AbstractUVCCameraHandler extends Handler {
 					mHandler = handler;
 					mSync.notifyAll();
 				}
+				Log.d(TAG, "run: Looper.loop() ");
+				//Looper.loop()会在当前线程执行死循环（没有消息的时候会阻塞），所以正常情况下，后面的代码是执行不了了。
 				Looper.loop();
 				if (mSoundPool != null) {
 					mSoundPool.release();
@@ -1033,6 +1234,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 				mHandler = null;
 				mSync.notifyAll();
 			}
+			Log.d(TAG, "run: end ");
 		}
 
 		/**

@@ -32,7 +32,9 @@ import com.serenegiant.encoder.IVideoEncoder;
 /**
  * 摄像头预览控件接口
  *
- * 保持窗口宽高比例接口 IAspectRatioView
+ *
+ * 保持窗口宽高比例接口
+ * IAspectRatioView
  * public interface IAspectRatioView {
  *     void setAspectRatio(double var1);
  *     void setAspectRatio(int var1, int var2);
