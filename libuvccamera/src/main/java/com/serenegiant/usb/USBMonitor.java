@@ -33,7 +33,9 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.SparseArray;
@@ -465,6 +467,7 @@ public final class USBMonitor {
 	 * @return
 	 * @throws SecurityException パーミッションがなければSecurityExceptionを投げる
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	public UsbControlBlock openDevice(final UsbDevice device) throws SecurityException {
 		if (hasPermission(device)) {
 			UsbControlBlock result = mCtrlBlocks.get(device);
@@ -570,6 +573,7 @@ public final class USBMonitor {
 		if (destroyed) return;
 		updatePermission(device, true);
 		mAsyncHandler.post(new Runnable() {
+			@RequiresApi(api = Build.VERSION_CODES.M)
 			@Override
 			public void run() {
 				if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
@@ -879,6 +883,7 @@ public final class USBMonitor {
 	 * @param device
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	public UsbDeviceInfo getDeviceInfo(final UsbDevice device) {
 		return updateDeviceInfo(mUsbManager, device, null);
 	}
@@ -890,6 +895,7 @@ public final class USBMonitor {
 	 * @param device
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	public static UsbDeviceInfo getDeviceInfo(final Context context, final UsbDevice device) {
 		return updateDeviceInfo((UsbManager)context.getSystemService(Context.USB_SERVICE), device, new UsbDeviceInfo());
 	}
@@ -901,6 +907,8 @@ public final class USBMonitor {
 	 * @param _info
 	 * @return
 	 */
+
+	@RequiresApi(api = Build.VERSION_CODES.M)
 	public static UsbDeviceInfo updateDeviceInfo(final UsbManager manager, final UsbDevice device, final UsbDeviceInfo _info) {
 		final UsbDeviceInfo info = _info != null ? _info : new UsbDeviceInfo();
 		info.clear();
@@ -1002,6 +1010,7 @@ public final class USBMonitor {
 		 * @param monitor
 		 * @param device
 		 */
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		private UsbControlBlock(final USBMonitor monitor, final UsbDevice device) {
 			if (DEBUG) Log.i(TAG, "UsbControlBlock:constructor");
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
@@ -1035,6 +1044,7 @@ public final class USBMonitor {
 		 * @param src
 		 * @throws IllegalStateException
 		 */
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		private UsbControlBlock(final UsbControlBlock src) throws IllegalStateException {
 			final USBMonitor monitor = src.getUSBMonitor();
 			final UsbDevice device = src.getDevice();
@@ -1056,10 +1066,11 @@ public final class USBMonitor {
 		/**
 		 * duplicate by clone
 		 * need permission
-		 * USBMonitor never handle cloned UsbControlBlock, you should release it after using it.
+		 * USBMonitor never handle cloned UsbControlBlock, y	ou should release it after using it.
 		 * @return
 		 * @throws CloneNotSupportedException
 		 */
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		@Override
 		public UsbControlBlock clone() throws CloneNotSupportedException {
 			final UsbControlBlock ctrlblock;
@@ -1254,6 +1265,7 @@ public final class USBMonitor {
 		 * @param interface_id
 		 * @throws IllegalStateException
 		 */
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		public synchronized UsbInterface getInterface(final int interface_id) throws IllegalStateException {
 			return getInterface(interface_id, 0);
 		}
@@ -1265,6 +1277,7 @@ public final class USBMonitor {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@RequiresApi(api = Build.VERSION_CODES.M)
 		public synchronized UsbInterface getInterface(final int interface_id, final int altsetting) throws IllegalStateException {
 			checkConnection();
 			SparseArray<UsbInterface> intfs = mInterfaces.get(interface_id);
