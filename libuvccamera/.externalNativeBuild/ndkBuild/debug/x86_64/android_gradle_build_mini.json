@@ -1,53 +1,53 @@
 {
   "buildFiles": [
-    "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk",
-    "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk"
+    "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk",
+    "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk"
   ],
   "cleanCommands": [
-    "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib clean"
+    "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib clean"
   ],
   "libraries": {
     "uvc_static-debug-x86_64": {
       "artifactName": "uvc_static",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libuvc_static.a",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libuvc_static.a",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libuvc_static.a"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libuvc_static.a"
     },
     "jpeg-turbo1500_static-debug-x86_64": {
       "artifactName": "jpeg-turbo1500_static",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libjpeg-turbo1500_static.a",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libjpeg-turbo1500_static.a",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libjpeg-turbo1500_static.a"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libjpeg-turbo1500_static.a"
     },
     "UVCCamera-debug-x86_64": {
       "artifactName": "UVCCamera",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libUVCCamera.so",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libUVCCamera.so",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libUVCCamera.so"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libUVCCamera.so"
     },
     "usb100-debug-x86_64": {
       "artifactName": "usb100",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libusb100.so",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libusb100.so",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libusb100.so"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libusb100.so"
     },
     "usb100_static-debug-x86_64": {
       "artifactName": "usb100_static",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libusb100_static.a",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libusb100_static.a",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libusb100_static.a"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libusb100_static.a"
     },
     "jpeg-turbo1500-debug-x86_64": {
       "artifactName": "jpeg-turbo1500",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libjpeg-turbo1500.so",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libjpeg-turbo1500.so",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libjpeg-turbo1500.so"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libjpeg-turbo1500.so"
     },
     "uvc-debug-x86_64": {
       "artifactName": "uvc",
-      "buildCommand": "C:\\Software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dC:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dC:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib C:/Mysher/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libuvc.so",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003dx86_64 NDK_ALL_ABIS\u003dx86_64 NDK_DEBUG\u003d1 APP_PLATFORM\u003dandroid-21 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\lib E:/maxlab/Android/UVCCamera/libuvccamera/build/intermediates/ndkBuild/debug/obj/local/x86_64/libuvc.so",
       "abi": "x86_64",
-      "output": "C:\\Mysher\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libuvc.so"
+      "output": "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\build\\intermediates\\ndkBuild\\debug\\obj\\local\\x86_64\\libuvc.so"
     }
   }
 }
