@@ -48,6 +48,8 @@
 
 #define	LOCAL_DEBUG 0
 
+#include "Common/loghelper.h"
+
 //**********************************************************************
 //
 //**********************************************************************
@@ -136,6 +138,8 @@ void UVCCamera::clearCameraParams() {
  */
 int UVCCamera::connect(int vid, int pid, int fd, int busnum, int devaddr, const char *usbfs) {
 	ENTER();
+	LOGH_BEGIN();
+
 	uvc_error_t result = UVC_ERROR_BUSY;
 	if (!mDeviceHandle && fd) {
 		if (mUsbFs)
@@ -184,12 +188,17 @@ int UVCCamera::connect(int vid, int pid, int fd, int busnum, int devaddr, const 
 		// カメラが既にopenしている時
 		LOGW("camera is already opened. you should release first");
 	}
+
+    LOGH_END();
 	RETURN(result, int);
+
 }
 
 // カメラを開放する
 int UVCCamera::release() {
 	ENTER();
+	LOGH_BEGIN();
+
 	stopPreview();
 	// カメラのclose処理
 	if (LIKELY(mDeviceHandle)) {
@@ -216,6 +225,8 @@ int UVCCamera::release() {
 		free(mUsbFs);
 		mUsbFs = NULL;
 	}
+
+	LOGH_END();
 	RETURN(0, int);
 }
 

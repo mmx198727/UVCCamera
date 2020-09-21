@@ -225,6 +225,7 @@ uvc_error_t uvc_find_device2(uvc_context_t *ctx, uvc_device_t **device, int vid,
 uvc_error_t uvc_get_device_with_fd(uvc_context_t *ctx, uvc_device_t **device,
 		int vid, int pid, const char *serial, int fd, int busnum, int devaddr) {
 
+	LOGOUTD("UVCCamera::uvc_get_device_with_fd() begin");
 	ENTER();
 
 	LOGD("call libusb_get_device_with_fd");
@@ -238,10 +239,14 @@ uvc_error_t uvc_get_device_with_fd(uvc_context_t *ctx, uvc_device_t **device,
 //		libusb_set_device_fd(usb_dev, fd);	// assign fd to libusb_device for non-rooted Android devices
 		uvc_ref_device(*device);
 		UVC_EXIT(UVC_SUCCESS);
+        LOGOUTD("device->ref:%d",(*device)->ref);
+
+		LOGOUTD("UVCCamera::uvc_get_device_with_fd() end by UVC_SUCCESS");
 		RETURN(UVC_SUCCESS, int);
 	} else {
 		LOGE("could not find specific device");
 		*device = NULL;
+		LOGOUTD("UVCCamera::uvc_get_device_with_fd() end by UVC_ERROR_NO_DEVICE");
 		RETURN(UVC_ERROR_NO_DEVICE, int);
 	}
 
@@ -269,7 +274,7 @@ uint8_t uvc_get_device_address(uvc_device_t *dev) {
  * @return Error opening device or SUCCESS
  */
 uvc_error_t uvc_open(uvc_device_t *dev, uvc_device_handle_t **devh) {
-	LOGOUTD("uvc_open()");
+    LOGH_BEGIN();
 	uvc_error_t ret;
 	struct libusb_device_handle *usb_devh;
 	uvc_device_handle_t *internal_devh;
@@ -342,7 +347,7 @@ uvc_error_t uvc_open(uvc_device_t *dev, uvc_device_handle_t **devh) {
 	*devh = internal_devh;
 
 	UVC_EXIT(ret);
-
+    LOGH_END();
 	return ret;
 
 fail:
@@ -371,7 +376,8 @@ fail2:
  * @param info Where to store a pointer to the new info struct
  */
 uvc_error_t uvc_get_device_info(uvc_device_t *dev, uvc_device_info_t **info) {
-	LOGOUTD("uvc_get_device_info()");
+    LOGH_BEGIN();
+
 	uvc_error_t ret;
 	uvc_device_info_t *internal_info;
 
@@ -382,6 +388,8 @@ uvc_error_t uvc_get_device_info(uvc_device_t *dev, uvc_device_info_t **info) {
 		UVC_EXIT(UVC_ERROR_NO_MEM);
 		return UVC_ERROR_NO_MEM;
 	}
+
+    LOGOUTD("uvc_get_device_info() call libusb_get_config_descriptor()");
 	if (libusb_get_config_descriptor(dev->usb_dev, 0, &(internal_info->config)) != 0) {
 //	if (libusb_get_active_config_descriptor(dev->usb_dev, &(internal_info->config)) != 0) {
 		// XXX assume libusb_get_active_config_descriptor　is better
@@ -392,6 +400,7 @@ uvc_error_t uvc_get_device_info(uvc_device_t *dev, uvc_device_info_t **info) {
 		return UVC_ERROR_IO;
 	}
 
+    LOGOUTD("uvc_get_device_info() call uvc_scan_control()");
 	ret = uvc_scan_control(dev, internal_info);
 	if (UNLIKELY(ret)) {
 		uvc_free_device_info(internal_info);
@@ -401,6 +410,7 @@ uvc_error_t uvc_get_device_info(uvc_device_t *dev, uvc_device_info_t **info) {
 
 	*info = internal_info;
 
+    LOGH_END();
 	UVC_EXIT(ret);
 	return ret;
 }
@@ -423,6 +433,7 @@ void uvc_free_device_info(uvc_device_info_t *info) {
 	uvc_frame_desc_t *frame, *frame_tmp;
 
 	UVC_ENTER();
+    LOGH_BEGIN();
 
 	DL_FOREACH_SAFE(info->ctrl_if.input_term_descs, input_term, input_term_tmp)
 	{
@@ -475,6 +486,7 @@ void uvc_free_device_info(uvc_device_info_t *info) {
 
 	free(info);
 
+    LOGH_END();
 	UVC_EXIT_VOID();
 }
 
@@ -491,13 +503,13 @@ void uvc_free_device_info(uvc_device_info_t *info) {
  */
 uvc_error_t uvc_get_device_descriptor(uvc_device_t *dev,
 		uvc_device_descriptor_t **desc) {
-
 	uvc_device_descriptor_t *desc_internal;
 	struct libusb_device_descriptor usb_desc;
 	struct libusb_device_handle *usb_devh;
 	uvc_error_t ret;
 
 	UVC_ENTER();
+    LOGH_BEGIN();
 
 	ret = libusb_get_device_descriptor(dev->usb_dev, &usb_desc);
 
@@ -542,6 +554,7 @@ uvc_error_t uvc_get_device_descriptor(uvc_device_t *dev,
 	*desc = desc_internal;
 
 	UVC_EXIT(ret);
+    LOGH_END();
 	return ret;
 }
 
@@ -553,6 +566,7 @@ uvc_error_t uvc_get_device_descriptor(uvc_device_t *dev,
  */
 void uvc_free_device_descriptor(uvc_device_descriptor_t *desc) {
 	UVC_ENTER();
+    LOGH_BEGIN();
 
 	if (desc->serialNumber)
 		free((void*) desc->serialNumber);
@@ -565,6 +579,7 @@ void uvc_free_device_descriptor(uvc_device_descriptor_t *desc) {
 
 	free(desc);
 
+    LOGH_END();
 	UVC_EXIT_VOID();
 }
 
@@ -906,6 +921,7 @@ uvc_error_t uvc_release_if(uvc_device_handle_t *devh, int idx) {
  * @ingroup device
  */
 uvc_error_t uvc_scan_control(uvc_device_t *dev, uvc_device_info_t *info) {
+    LOGOUTD("uvc_scan_control() begin");
 	const struct libusb_interface_descriptor *if_desc;
 	uvc_error_t parse_ret, ret;
 	int interface_idx;
@@ -919,17 +935,20 @@ uvc_error_t uvc_scan_control(uvc_device_t *dev, uvc_device_info_t *info) {
 
 	if (LIKELY(info && info->config)) {	// XXX add to avoid crash
 		MARK("bNumInterfaces=%d", info->config->bNumInterfaces);
+        LOGOUTD("uvc_scan_control() info->config->bNumInterfaces = %d",info->config->bNumInterfaces);
 		for (interface_idx = 0; interface_idx < info->config->bNumInterfaces; ++interface_idx) {
 			if_desc = &info->config->interface[interface_idx].altsetting[0];
 			MARK("interface_idx=%d:bInterfaceClass=%02x,bInterfaceSubClass=%02x", interface_idx, if_desc->bInterfaceClass, if_desc->bInterfaceSubClass);
 			// select first found Video control
 			if (if_desc->bInterfaceClass == LIBUSB_CLASS_VIDEO/*14*/ && if_desc->bInterfaceSubClass == 1) // Video, Control
+                LOGOUTD("uvc_scan_control() interface_idx = %d is (Video, Control) ", interface_idx);
 				break;
 
 			// Another TIS camera hack.
 			if (if_desc->bInterfaceClass == 255 && if_desc->bInterfaceSubClass == 1) {
 				uvc_device_descriptor_t* dev_desc;
 				int haveTISCamera = 0;
+                LOGOUTD("uvc_scan_control() call uvc_get_device_descriptor()");
 				uvc_get_device_descriptor (dev, &dev_desc);
 				if (dev_desc->idVendor == 0x199e && dev_desc->idProduct == 0x8101) {
 					haveTISCamera = 1;
@@ -946,6 +965,7 @@ uvc_error_t uvc_scan_control(uvc_device_t *dev, uvc_device_info_t *info) {
 	if (UNLIKELY(!if_desc)) {
 		UVC_EXIT(UVC_ERROR_INVALID_DEVICE);
 		LOGE("UVC_ERROR_INVALID_DEVICE");
+        LOGOUTD("uvc_scan_control() end by UVC_ERROR_INVALID_DEVICE");
 		return UVC_ERROR_INVALID_DEVICE;
 	}
 
@@ -971,6 +991,7 @@ uvc_error_t uvc_scan_control(uvc_device_t *dev, uvc_device_info_t *info) {
 	}
 
 	UVC_EXIT(ret);
+    LOGOUTD("uvc_scan_control() end by UVC_SUCCESS");
 	return ret;
 }
 

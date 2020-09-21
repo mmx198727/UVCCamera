@@ -34,6 +34,18 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1):__FILE__)
 
+#define LOGH_BEGIN(...) \
+  logOut(__FILENAME__, __FUNCTION__, __LINE__, DEBUG, "function begin", ##__VA_ARGS__);
+
+#define LOGH_END(...) \
+  logOut(__FILENAME__, __FUNCTION__, __LINE__, DEBUG, "function end", ##__VA_ARGS__);
+
+#define LOGH_EXIT(...) \
+  logOut(__FILENAME__, __FUNCTION__, __LINE__, DEBUG, "module exit", ##__VA_ARGS__);
+
+
+#define LOGH_PRINT(cFormat, ...) \
+  logOut(__FILENAME__, __FUNCTION__, __LINE__, DEBUG, cFormat, ##__VA_ARGS__);
 
 #define LOGOUTD(cFormat, ...) \
   logOut(__FILENAME__, __FUNCTION__, __LINE__, DEBUG, cFormat, ##__VA_ARGS__);
@@ -50,6 +62,7 @@
 /** @brief 当前日志级别
  */
 static int g_logLevel = DEBUG;
+static char g_tag[20] = "log helper";
 //int g_logLevel = INFO;
 
 /**  Android log打印
@@ -74,7 +87,7 @@ static void logOut(const char* file, const char* func, int line, int level, cons
 
   va_end(args);
 
-  __android_log_print(level, "libuvccamera_tag", "%s_%d(%s):%s\n", file, line, func, buf);
+  __android_log_print(level, g_tag, "%s_%d(%s):%s\n", file, line, func, buf);
 }
 
 #endif //UVCCAMERA_LOGHELPER_H

@@ -120,23 +120,28 @@ jint setField_int(JNIEnv *env, jobject java_obj, const char *field_name, jint va
 }
 
 static ID_TYPE nativeCreate(JNIEnv *env, jobject thiz) {
-	LOGOUTD("nativeCreate()");
 	ENTER();
+	LOGH_BEGIN();
 	UVCCamera *camera = new UVCCamera();
 	setField_long(env, thiz, "mNativePtr", reinterpret_cast<ID_TYPE>(camera));
+	LOGH_END();
 	RETURN(reinterpret_cast<ID_TYPE>(camera), ID_TYPE);
 }
 
 // native側のカメラオブジェクトを破棄
 static void nativeDestroy(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
-    LOGOUTD("nativeDestroy()");
+
 	ENTER();
+	LOGH_BEGIN();
+
 	setField_long(env, thiz, "mNativePtr", 0);
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		SAFE_DELETE(camera);
 	}
+	LOGH_END();
+	LOGH_EXIT();
 	EXIT();
 }
 
@@ -146,16 +151,28 @@ static jint nativeConnect(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera,
 	jint vid, jint pid, jint fd,
 	jint busNum, jint devAddr, jstring usbfs_str) {
-    LOGOUTD("nativeDestroy()");
+
 	ENTER();
+	LOGH_BEGIN();
+
 	int result = JNI_ERR;
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	const char *c_usbfs = env->GetStringUTFChars(usbfs_str, JNI_FALSE);
+
+    LOGH_PRINT("vid=%d",vid);
+	LOGH_PRINT("pid=%d",pid);
+	LOGH_PRINT("fd=%d",fd);
+	LOGH_PRINT("busNum=%d",busNum);
+	LOGH_PRINT("devAddr=%d",devAddr);
+	LOGH_PRINT("c_usbfs=%s",c_usbfs);
+
 	if (LIKELY(camera && (fd > 0))) {
 //		libusb_set_debug(NULL, LIBUSB_LOG_LEVEL_DEBUG);
 		result =  camera->connect(vid, pid, fd, busNum, devAddr, c_usbfs);
 	}
 	env->ReleaseStringUTFChars(usbfs_str, c_usbfs);
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
@@ -164,11 +181,15 @@ static jint nativeRelease(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
 
 	ENTER();
+	LOGH_BEGIN();
+
 	int result = JNI_ERR;
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		result = camera->release();
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
@@ -177,12 +198,17 @@ static jint nativeSetStatusCallback(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera, jobject jIStatusCallback) {
 
 	jint result = JNI_ERR;
+
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		jobject status_callback_obj = env->NewGlobalRef(jIStatusCallback);
 		result = camera->setStatusCallback(env, status_callback_obj);
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
@@ -191,20 +217,24 @@ static jint nativeSetButtonCallback(JNIEnv *env, jobject thiz,
 
 	jint result = JNI_ERR;
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		jobject button_callback_obj = env->NewGlobalRef(jIButtonCallback);
 		result = camera->setButtonCallback(env, button_callback_obj);
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
 static jobject nativeGetSupportedSize(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
 
-	LOGOUTD("nativeGetSupportedSize()");
-
 	ENTER();
+	LOGH_BEGIN();
+
 	jstring result = NULL;
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
@@ -214,6 +244,8 @@ static jobject nativeGetSupportedSize(JNIEnv *env, jobject thiz,
 			free(c_str);
 		}
 	}
+
+	LOGH_END();
 	RETURN(result, jobject);
 }
 
@@ -223,10 +255,15 @@ static jint nativeSetPreviewSize(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera, jint width, jint height, jint min_fps, jint max_fps, jint mode, jfloat bandwidth) {
 
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
+        LOGH_END();
 		return camera->setPreviewSize(width, height, min_fps, max_fps, mode, bandwidth);
 	}
+
+	LOGH_END();
 	RETURN(JNI_ERR, jint);
 }
 
@@ -234,10 +271,14 @@ static jint nativeStartPreview(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
 
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		return camera->startPreview();
 	}
+
+	LOGH_END();
 	RETURN(JNI_ERR, jint);
 }
 
@@ -246,11 +287,16 @@ static jint nativeStopPreview(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera) {
 
 	jint result = JNI_ERR;
+
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		result = camera->stopPreview();
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
@@ -258,12 +304,17 @@ static jint nativeSetPreviewDisplay(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera, jobject jSurface) {
 
 	jint result = JNI_ERR;
+
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		ANativeWindow *preview_window = jSurface ? ANativeWindow_fromSurface(env, jSurface) : NULL;
 		result = camera->setPreviewDisplay(preview_window);
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
@@ -271,12 +322,17 @@ static jint nativeSetFrameCallback(JNIEnv *env, jobject thiz,
 	ID_TYPE id_camera, jobject jIFrameCallback, jint pixel_format) {
 
 	jint result = JNI_ERR;
+
 	ENTER();
+	LOGH_BEGIN();
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
 		jobject frame_callback_obj = env->NewGlobalRef(jIFrameCallback);
 		result = camera->setFrameCallback(env, frame_callback_obj, pixel_format);
 	}
+
+	LOGH_END();
 	RETURN(result, jint);
 }
 
