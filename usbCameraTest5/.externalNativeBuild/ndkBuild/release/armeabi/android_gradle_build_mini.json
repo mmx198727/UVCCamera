@@ -1,0 +1,53 @@
+{
+  "buildFiles": [
+    "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk",
+    "E:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk"
+  ],
+  "cleanCommands": [
+    "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib clean"
+  ],
+  "libraries": {
+    "jpeg-turbo1500-release-armeabi": {
+      "artifactName": "jpeg-turbo1500",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libjpeg-turbo1500.so",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libjpeg-turbo1500.so"
+    },
+    "usb100-release-armeabi": {
+      "artifactName": "usb100",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libusb100.so",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libusb100.so"
+    },
+    "UVCCamera-release-armeabi": {
+      "artifactName": "UVCCamera",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libUVCCamera.so",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libUVCCamera.so"
+    },
+    "uvc_static-release-armeabi": {
+      "artifactName": "uvc_static",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libuvc_static.a",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libuvc_static.a"
+    },
+    "usb100_static-release-armeabi": {
+      "artifactName": "usb100_static",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libusb100_static.a",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libusb100_static.a"
+    },
+    "uvc-release-armeabi": {
+      "artifactName": "uvc",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libuvc.so",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libuvc.so"
+    },
+    "jpeg-turbo1500_static-release-armeabi": {
+      "artifactName": "jpeg-turbo1500_static",
+      "buildCommand": "E:\\software\\android-ndk-r11c\\ndk-build.cmd NDK_PROJECT_PATH\u003dnull APP_BUILD_SCRIPT\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Android.mk NDK_APPLICATION_MK\u003dE:\\maxlab\\Android\\UVCCamera\\libuvccamera\\src\\main\\jni\\Application.mk APP_ABI\u003darmeabi NDK_ALL_ABIS\u003darmeabi NDK_DEBUG\u003d0 APP_PLATFORM\u003dandroid-18 NDK_OUT\u003dE:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj NDK_LIBS_OUT\u003dE:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\lib E:/maxlab/Android/UVCCamera/usbCameraTest5/build/intermediates/ndkBuild/release/obj/local/armeabi/libjpeg-turbo1500_static.a",
+      "abi": "armeabi",
+      "output": "E:\\maxlab\\Android\\UVCCamera\\usbCameraTest5\\build\\intermediates\\ndkBuild\\release\\obj\\local\\armeabi\\libjpeg-turbo1500_static.a"
+    }
+  }
+}

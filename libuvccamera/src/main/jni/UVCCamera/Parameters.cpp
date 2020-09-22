@@ -345,8 +345,19 @@ char *UVCDiags::getCurrentStream(const uvc_stream_ctrl_t *ctrl) {
 	RETURN(strdup(buffer.GetString()), char *);
 }
 
+/**
+ * 获取设备支持的视频格式，以及视频格式包含的分辨率
+ * @param deviceHandle
+ * @return	视频格式字符串（需要用户自行拆分）
+ * 			格式如：{"formats":[
+ * 			{"index":1,"type":4,"guidFormat":"NV21","default":1,"size":["640x360"]},
+ * 			{"index":2,"type":6,"guidFormat":"MJPG","default":1,"size":["640x360","1280x720","1920x1080","3840x2160"]},
+ * 			{"index":3,"type":16,"guidFormat":"H264","default":1,"size":["640x360","1280x720","1920x1080","3840x2160"]}
+ * 			]
+ * @see uvc_device_handle_t
+ */
 char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
-	LOGOUTD("UVCDiags::getSupportedSize()");
+	LOGH_BEGIN();
 
 	StringBuffer buffer;
 	Writer<StringBuffer> writer(buffer);
@@ -368,16 +379,23 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 				uvc_frame_desc_t *frame_desc;
 				DL_FOREACH(stream_if->format_descs, fmt_desc)
 				{
-					//输出视频格式
-					LOGOUTD("UVCDiags::getSupportedSize() fmt_desc->guidFormat:%c %c %c %c",fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3])
-					LOGOUTD("UVCDiags::getSupportedSize() fmt_desc->bDescriptorSubtype:%x",fmt_desc->bDescriptorSubtype);
+                    //通过guid获取视频格式字符串
+                    char *guidFormat = getGuidFormat(fmt_desc); //调用会崩溃
+//					char guidFormat[4] = "";
+//					sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
+
+				    //输出视频格式
+					LOGH_PRINT("bDescriptorSubtype:%x, guidFormat:%s",
+							fmt_desc->bDescriptorSubtype, guidFormat)
 					writer.StartObject();
 					{
 						switch (fmt_desc->bDescriptorSubtype) {
-						case UVC_VS_FORMAT_UNCOMPRESSED:
+						case UVC_VS_FORMAT_UNCOMPRESSED: //不只是YUY2,其他非压缩视频格式也在此，如NV21，NV12
 						case UVC_VS_FORMAT_MJPEG:
+                        case UVC_VS_FORMAT_FRAME_BASED: // 所有非MJPG的压缩视频格式，H264，H265
 							write(writer, "index", fmt_desc->bFormatIndex);
 							write(writer, "type", fmt_desc->bDescriptorSubtype);
+                            write(writer, "guidFormat", guidFormat);
 							write(writer, "default", fmt_desc->bDefaultFrameIndex);
 							writer.String("size");
 							writer.StartArray();
@@ -398,10 +416,43 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 			}
 			writer.EndArray();
 			// FIXME still image is not supported now
-			LOGOUTD(buffer.GetString());
+
+			LOGH_PRINT(buffer.GetString());
 		}
 	}
 	writer.EndObject();
+
+    LOGH_END();
 	RETURN(strdup(buffer.GetString()), char *);
 
+}
+
+
+/**
+ * 从 Guid 获取 视频格式名称
+ * @param fmt_desc
+ * @return
+ */
+char* UVCDiags::getGuidFormat(uvc_format_desc_t *fmt_desc){
+
+    ENTER();
+    LOGH_BEGIN();
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+
+    //通过guid获取视频格式字符串
+    char guidFormat[4] = "";
+    sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
+
+    writer.StartObject();
+    {
+        writer.String(guidFormat);
+    }
+    writer.EndObject();
+
+    LOGH_END();
+    RETURN(strdup(buffer.GetString()), char *);
+
+    return guidFormat;
 }
