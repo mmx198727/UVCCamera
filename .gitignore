@@ -45,6 +45,10 @@ proguard/
 .gradle
 build/
 build
+.externalNativeBuild/
+.externalNativeBuild
+*/.externalNativeBuild/
+*/.externalNativeBuild
 
 # gedit
 *~
