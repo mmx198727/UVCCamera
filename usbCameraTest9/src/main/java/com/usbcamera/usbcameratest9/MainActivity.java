@@ -83,26 +83,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.start_btn:
-                if (!mCameraHandler.isOpened()) {
-                    CameraDialog.showDialog(MainActivity.this);
-                }
-                break;
-            case R.id.stop_btn:
-                if (mCameraHandler.isOpened()){
-                    mCameraHandler.close();
-//                    mCaptureButton.setVisibility(View.INVISIBLE);
-//                    setCameraButton(false);
-                }
-                break;
-            default:
-                break;
-        }
-    }
-
+    /**
+     * USBMonitor响应
+     */
     private final USBMonitor.OnDeviceConnectListener mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener() {
         @Override
         public void onAttach(final UsbDevice device) {
@@ -132,13 +115,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    private Surface mSurface;
+
+    /**
+     * 开始预览
+     */
     private void startPreview() {
         final SurfaceTexture st = mUVCCameraView.getSurfaceTexture();
         if (mSurface != null) {
             mSurface.release();
         }
-        mSurface = new Surface(st);
+        Surface mSurface = new Surface(st);
         mCameraHandler.startPreview(mSurface);
         runOnUiThread(new Runnable() {
             @Override
@@ -148,15 +134,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
+    /**
+     * CameraDialog.CameraDialogParent接口——获取USBMonitor
+     * @return
+     */
     @Override
     public USBMonitor getUSBMonitor() {
         return mUSBMonitor;
     }
 
+    /**
+     * CameraDialog.CameraDialogParent接口——对话框点击事件（确定或取消）
+     * @param canceled
+     */
     @Override
     public void onDialogResult(boolean canceled) {
         if (canceled) {
             //setCameraButton(false);
+        }
+    }
+
+    /**
+     * 按钮响应
+     * @param v
+     */
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.start_btn:
+                if (!mCameraHandler.isOpened()) {
+                    CameraDialog.showDialog(MainActivity.this);
+                }
+                break;
+            case R.id.stop_btn:
+                if (mCameraHandler.isOpened()){
+                    mCameraHandler.close();
+//                    mCaptureButton.setVisibility(View.INVISIBLE);
+//                    setCameraButton(false);
+                }
+                break;
+            default:
+                break;
         }
     }
 
