@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.serenegiant.usbcameratest5;
+package com.serenegiant.usbcameratest10;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;

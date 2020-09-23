@@ -119,12 +119,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 开始预览
      */
+    Surface mSurface = null;
     private void startPreview() {
         final SurfaceTexture st = mUVCCameraView.getSurfaceTexture();
         if (mSurface != null) {
             mSurface.release();
         }
-        Surface mSurface = new Surface(st);
+        mSurface = new Surface(st);
         mCameraHandler.startPreview(mSurface);
         runOnUiThread(new Runnable() {
             @Override

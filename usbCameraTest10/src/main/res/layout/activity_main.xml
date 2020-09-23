@@ -1,69 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~  UVCCamera
-  ~  library and sample to access to UVC web camera on non-rooted Android device
-  ~
-  ~ Copyright (c) 2014-2017 saki t_saki@serenegiant.com
-  ~
-  ~  Licensed under the Apache License, Version 2.0 (the "License");
-  ~  you may not use this file except in compliance with the License.
-  ~   You may obtain a copy of the License at
-  ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~   Unless required by applicable law or agreed to in writing, software
-  ~   distributed under the License is distributed on an "AS IS" BASIS,
-  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~   See the License for the specific language governing permissions and
-  ~   limitations under the License.
-  ~
-  ~  All files in the folder are under this Apache License, Version 2.0.
-  ~  Files in the libjpeg-turbo, libusb, libuvc, rapidjson folder
-  ~  may have a different license, see the respective files.
-  -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/RelativeLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-	android:background="#ff000000"
-	tools:context="com.serenegiant.usbcameratest5.MainActivity"
-    tools:ignore="MergeRootFrame" >
+    tools:context=".MainActivity"
+    android:orientation="vertical">
 
-    <com.serenegiant.widget.UVCCameraTextureView
-        android:id="@+id/camera_view"
+    <!--控制区域-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/LIGHTGRAY"
+        android:orientation="vertical">
+
+        <!--设备列表-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="设备">
+            </TextView>
+
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/dev_spinner"
+                >
+            </Spinner>
+        </LinearLayout>
+
+        <!--视频格式列表-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="视频格式">
+            </TextView>
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content">
+            </Spinner>
+        </LinearLayout>
+
+        <!--分辨率列表-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="分辨率">
+            </TextView>
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content">
+            </Spinner>
+        </LinearLayout>
+
+        <!--帧率列表-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:text="帧率">
+            </TextView>
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content">
+            </Spinner>
+        </LinearLayout>
+
+        <!--按钮区域-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <!--开始按钮-->
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:id="@+id/start_btn"
+                android:text="Start"
+                android:layout_margin="2dp"
+                android:textAllCaps="false">
+            </Button>
+            <!--停止按钮-->
+            <Button
+                android:layout_width="100dp"
+                android:layout_height="40dp"
+                android:id="@+id/stop_btn"
+                android:text="Stop"
+                android:layout_margin="2dp"
+                android:textAllCaps="false">
+            </Button>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!--预览区域-->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+        android:layout_weight="1"
+        android:background="@color/BLACK">
 
-	<ImageView
-        android:id="@+id/frame_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/camera_view"
-        android:layout_alignBottom="@+id/camera_view"
-        android:layout_alignLeft="@+id/camera_view"
-        android:layout_alignRight="@+id/camera_view"
-        android:src="@drawable/border" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ToggleButton
-        android:id="@+id/camera_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/camera_view"
-        android:layout_alignTop="@id/camera_view"
-        android:text="ToggleButton" />
+            <com.serenegiant.widget.UVCCameraTextureView
+                android:id="@+id/camera_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
 
-    <ImageButton
-        android:id="@+id/capture_button"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_alignBottom="@id/camera_view"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="6dp"
-        android:background="@null"
-        android:scaleType="centerCrop"
-        android:src="@android:drawable/ic_menu_camera" />
 
-</RelativeLayout>
+            <ImageView
+                android:id="@+id/frame_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/camera_view"
+                android:layout_alignBottom="@+id/camera_view"
+                android:layout_alignLeft="@+id/camera_view"
+                android:layout_alignRight="@+id/camera_view"
+                android:src="@drawable/border" />
+
+            <ToggleButton
+                android:id="@+id/camera_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/camera_view"
+                android:layout_alignTop="@id/camera_view"
+                android:text="ToggleButton" />
+
+            <ImageButton
+                android:id="@+id/capture_button"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                android:layout_alignBottom="@id/camera_view"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="6dp"
+                android:background="@null"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_camera" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

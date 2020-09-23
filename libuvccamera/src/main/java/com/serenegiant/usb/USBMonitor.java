@@ -462,6 +462,68 @@ public final class USBMonitor {
 	}
 
 	/**
+	 * 申请权限
+	 * @param device
+	 * @return
+	 */
+	public synchronized boolean usbCamera_requestPermission(final UsbDevice device) {
+//		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		boolean result = false;
+		if (isRegistered()) {
+			if (device != null) {
+				if (mUsbManager.hasPermission(device)) {
+
+				} else {
+					try {
+						mUsbManager.requestPermission(device, mPermissionIntent);
+					} catch (final Exception e) {
+						result = true;
+					}
+				}
+			} else {
+				result = true;
+			}
+		} else {
+			result = true;
+		}
+		return result;
+	}
+
+
+
+
+	/**
+	 * 连接设备
+	 * @param device
+	 */
+	public synchronized void usbCamera_processConnect(final UsbDevice device) {
+		if (destroyed) return;
+		updatePermission(device, true);
+		mAsyncHandler.post(new Runnable() {
+			@RequiresApi(api = Build.VERSION_CODES.M)
+			@Override
+			public void run() {
+				if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
+				UsbControlBlock ctrlBlock;
+				final boolean createNew;
+				ctrlBlock = mCtrlBlocks.get(device);
+				if (ctrlBlock == null) {
+					//初始化（3）
+					ctrlBlock = new UsbControlBlock(USBMonitor.this, device);
+					mCtrlBlocks.put(device, ctrlBlock);
+					createNew = true;
+				} else {
+					createNew = false;
+				}
+				if (mOnDeviceConnectListener != null) {
+					//初始化（5）
+					mOnDeviceConnectListener.onConnect(device, ctrlBlock, createNew);
+				}
+			}
+		});
+	}
+
+	/**
 	 * 指定したUsbDeviceをopenする
 	 * @param device
 	 * @return
@@ -1011,7 +1073,7 @@ public final class USBMonitor {
 		 * @param device
 		 */
 		@RequiresApi(api = Build.VERSION_CODES.M)
-		private UsbControlBlock(final USBMonitor monitor, final UsbDevice device) {
+		public UsbControlBlock(final USBMonitor monitor, final UsbDevice device) {
 			if (DEBUG) Log.i(TAG, "UsbControlBlock:constructor");
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
 			mWeakDevice = new WeakReference<UsbDevice>(device);
