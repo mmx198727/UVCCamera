@@ -345,6 +345,26 @@ char *UVCDiags::getCurrentStream(const uvc_stream_ctrl_t *ctrl) {
 	RETURN(strdup(buffer.GetString()), char *);
 }
 
+
+char* getInt(int num){
+    ENTER();
+    LOGH_BEGIN();
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+
+    //通过guid获取视频格式字符串
+    char guidFormat[10] = "";
+    sprintf(guidFormat, "%d", num);
+
+    writer.String(guidFormat);
+
+    LOGH_END();
+    RETURN(strdup(buffer.GetString()), char *);
+
+    return guidFormat;
+}
+
 /**
  * 获取设备支持的视频格式，以及视频格式包含的分辨率
  * @param deviceHandle
@@ -380,30 +400,36 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 				DL_FOREACH(stream_if->format_descs, fmt_desc)
 				{
                     //通过guid获取视频格式字符串
-                    char *guidFormat = getGuidFormat(fmt_desc); //调用会崩溃
-//					char guidFormat[4] = "";
-//					sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
+//                    char *guidFormat = getGuidFormat(fmt_desc); //调用会崩溃
+					char guidFormat[4] = "";
+					sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
 
 				    //输出视频格式
-					LOGH_PRINT("bDescriptorSubtype:%x, guidFormat:%s",
-							fmt_desc->bDescriptorSubtype, guidFormat)
+					LOGH_PRINT("bDescriptorSubtype:%x, guidFormat:%s",fmt_desc->bDescriptorSubtype, guidFormat)
+
 					writer.StartObject();
 					{
 						switch (fmt_desc->bDescriptorSubtype) {
 						case UVC_VS_FORMAT_UNCOMPRESSED: //不只是YUY2,其他非压缩视频格式也在此，如NV21，NV12
 						case UVC_VS_FORMAT_MJPEG:
                         case UVC_VS_FORMAT_FRAME_BASED: // 所有非MJPG的压缩视频格式，H264，H265
+
 							write(writer, "index", fmt_desc->bFormatIndex);
 							write(writer, "type", fmt_desc->bDescriptorSubtype);
                             write(writer, "guidFormat", guidFormat);
 							write(writer, "default", fmt_desc->bDefaultFrameIndex);
 							writer.String("size");
 							writer.StartArray();
+
 							DL_FOREACH(fmt_desc->frame_descs, frame_desc)
 							{
-								snprintf(buf, sizeof(buf), "%dx%d", frame_desc->wWidth, frame_desc->wHeight);
-								buf[sizeof(buf)-1] = '\0';
-								writer.String(buf);
+                                writer.StartObject();
+                                {
+                                    char sizeBuf[256] = "";
+                                    sprintf(sizeBuf, "%dx%d", frame_desc->wWidth, frame_desc->wHeight);
+                                    write(writer, "size", sizeBuf);
+                                    writer.EndObject();
+                                }
 							}
 							writer.EndArray();
 							break;
@@ -445,11 +471,7 @@ char* UVCDiags::getGuidFormat(uvc_format_desc_t *fmt_desc){
     char guidFormat[4] = "";
     sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
 
-    writer.StartObject();
-    {
-        writer.String(guidFormat);
-    }
-    writer.EndObject();
+    writer.String(guidFormat);
 
     LOGH_END();
     RETURN(strdup(buffer.GetString()), char *);
