@@ -410,7 +410,7 @@ static uvc_error_t _prepare_stream_ctrl(uvc_device_handle_t *devh, uvc_stream_ct
 static uvc_error_t _uvc_get_stream_ctrl_format(uvc_device_handle_t *devh,
 	uvc_streaming_interface_t *stream_if, uvc_stream_ctrl_t *ctrl, uvc_format_desc_t *format,
 	const int width, const int height,
-	const int min_fps, const int max_fps) {
+	 int min_fps,  int max_fps) {
 
 	ENTER();
 
@@ -465,16 +465,22 @@ static uvc_error_t _uvc_get_stream_ctrl_format(uvc_device_handle_t *devh,
 
 		uint32_t *interval;
 
+        min_fps = 30;
+        max_fps = 30;
+        LOGH_PRINT("minfps:%d maxfps:%d", min_fps,max_fps);
+
 		if (frame->intervals) {
 			for (interval = frame->intervals; *interval; ++interval) {
 				if (UNLIKELY(!(*interval))) continue;
 				uint32_t it = 10000000 / *interval;
+                LOGH_PRINT("fps:%d", it);
 				LOGV("it:%d", it);
 				if ((it >= (uint32_t) min_fps) && (it <= (uint32_t) max_fps)) {
 					ctrl->bmHint = (1 << 0); /* don't negotiate interval */
 					ctrl->bFormatIndex = format->bFormatIndex;
 					ctrl->bFrameIndex = frame->bFrameIndex;
 					ctrl->dwFrameInterval = *interval;
+					LOGH_PRINT("use fps:%d", it);
 
 					goto found;
 				}
@@ -539,9 +545,9 @@ uvc_error_t uvc_get_stream_ctrl_format_size(uvc_device_handle_t *devh,
 uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl, enum uvc_frame_format cf, int width,
 		int height, int min_fps, int max_fps) {
-
-    LOGOUTD("uvc_get_stream_ctrl_format_size_fps()");
 	ENTER();
+
+    LOGH_PRINT("width:%d height:%d min_fps:%d max_fps:%d", width, height, min_fps, max_fps);
 
 	uvc_streaming_interface_t *stream_if;
 	uvc_error_t result;

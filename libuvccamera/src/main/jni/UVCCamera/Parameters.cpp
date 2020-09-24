@@ -417,29 +417,49 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 							write(writer, "index", fmt_desc->bFormatIndex);
 							write(writer, "type", fmt_desc->bDescriptorSubtype);
                             write(writer, "guidFormat", guidFormat);
-							write(writer, "default", fmt_desc->bDefaultFrameIndex);
-							writer.String("size");
+							write(writer, "defaultSize", fmt_desc->bDefaultFrameIndex);
+							writer.String("sizeList");
 							writer.StartArray();
-
-							DL_FOREACH(fmt_desc->frame_descs, frame_desc)
 							{
-                                writer.StartObject();
-                                {
-                                    char sizeBuf[256] = "";
-                                    sprintf(sizeBuf, "%dx%d", frame_desc->wWidth, frame_desc->wHeight);
-                                    write(writer, "size", sizeBuf);
-                                    writer.EndObject();
-                                }
-							}
+								DL_FOREACH(fmt_desc->frame_descs, frame_desc)
+								{
+									writer.StartObject();
+									{
+										write(writer, "width", frame_desc->wWidth);
+										write(writer, "height", frame_desc->wHeight);
+										LOGH_PRINT("size:%dx%d",frame_desc->wWidth, frame_desc->wHeight);
+
+										writer.String("fpsList");
+										writer.StartArray();
+										{
+											uint32_t *interval;
+											if (frame_desc->intervals) {
+												for (interval = frame_desc->intervals; *interval; ++interval) {
+													if (UNLIKELY(!(*interval))) continue;
+													uint32_t it = 10000000 / *interval;
+													LOGH_PRINT("fps:%d", it);
+													writer.StartObject();
+													{
+														write(writer, "fps", it);
+													}//end fpsList-item
+													writer.EndObject();
+												}
+											}
+										}//end fpsList
+										writer.EndArray();
+									}//end sizeList-item
+									writer.EndObject();
+								}
+							}//end sizeList
 							writer.EndArray();
 							break;
 						default:
 							break;
 						}
-					}
+					}//end formatList-item
 					writer.EndObject();
 				}
-			}
+			}//end formatList
 			writer.EndArray();
 			// FIXME still image is not supported now
 

@@ -10,7 +10,7 @@
     <!--控制区域-->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="@dimen/activity_control_height"
         android:background="@color/LIGHTGRAY"
         android:orientation="vertical">
 
@@ -20,13 +20,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="70dp"
+                android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
                 android:text="设备">
             </TextView>
 
             <Spinner
-                android:layout_width="wrap_content"
+                android:layout_width="@dimen/activity_spinner_width"
                 android:layout_height="wrap_content"
                 android:id="@+id/dev_spinner"
                 >
@@ -39,14 +39,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="70dp"
+                android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
                 android:text="视频格式">
             </TextView>
 
             <Spinner
-                android:layout_width="150dp"
-                android:layout_height="wrap_content">
+                android:layout_width="@dimen/activity_spinner_width"
+                android:layout_height="wrap_content"
+                android:id="@+id/format_spinner">
             </Spinner>
         </LinearLayout>
 
@@ -56,14 +57,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="70dp"
+                android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
                 android:text="分辨率">
             </TextView>
 
             <Spinner
-                android:layout_width="150dp"
-                android:layout_height="wrap_content">
+                android:layout_width="@dimen/activity_spinner_width"
+                android:layout_height="wrap_content"
+                android:id="@+id/size_spinner">
             </Spinner>
         </LinearLayout>
 
@@ -73,14 +75,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="70dp"
+                android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
                 android:text="帧率">
             </TextView>
 
             <Spinner
-                android:layout_width="150dp"
-                android:layout_height="wrap_content">
+                android:layout_width="@dimen/activity_spinner_width"
+                android:layout_height="wrap_content"
+                android:id="@+id/fps_spinner">
             </Spinner>
         </LinearLayout>
 
@@ -91,8 +94,8 @@
             android:orientation="horizontal">
             <!--开始按钮-->
             <Button
-                android:layout_width="100dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/activity_button_width"
+                android:layout_height="@dimen/activity_button_height"
                 android:id="@+id/start_btn"
                 android:text="Start"
                 android:layout_margin="2dp"
@@ -100,8 +103,8 @@
             </Button>
             <!--停止按钮-->
             <Button
-                android:layout_width="100dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/activity_button_width"
+                android:layout_height="@dimen/activity_button_height"
                 android:id="@+id/stop_btn"
                 android:text="Stop"
                 android:layout_margin="2dp"
@@ -128,8 +131,6 @@
                 android:layout_height="match_parent"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true" />
-
-
             <ImageView
                 android:id="@+id/frame_image"
                 android:layout_width="wrap_content"

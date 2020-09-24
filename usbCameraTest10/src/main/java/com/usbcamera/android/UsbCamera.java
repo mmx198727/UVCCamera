@@ -2,16 +2,13 @@ package com.usbcamera.android;
 
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
-import android.util.Log;
 
 import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.widget.CameraViewInterface;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.usbcamera.android.bean.FormatsBean;
 
 import java.util.List;
 
@@ -31,6 +28,10 @@ public class UsbCamera {
     private DeviceListAdapter mDeviceListAdapter;
     private List<String> mFormatList;
     private List<String> mResolutionList;
+
+    public FormatsBean getmFormatsBean() { return mFormatsBean; }
+
+    private FormatsBean mFormatsBean;
 
     public DeviceListAdapter getmDeviceListAdapter() { return mDeviceListAdapter; }
 
@@ -75,60 +76,27 @@ public class UsbCamera {
      * @param devId
      * @return
      */
-    public String getSupportSize(int devId){
+    public FormatsBean getSupportSize(int devId){
         final Object item = mDeviceListAdapter.getItem(devId);
         if (item instanceof UsbDevice) {
-            String strSupportSize = "";
+
             try {
                 UsbDevice device = (UsbDevice)item;
                 USBMonitor.UsbControlBlock ctrlBlock = new USBMonitor.UsbControlBlock(mUSBMonitor, device);
 
                 final UVCCamera camera = new UVCCamera();
                 camera.open(ctrlBlock);
-                strSupportSize = camera.getSupportedSize();
+                String jsonStr = camera.getSupportedSize();
                 camera.close();
-
-                parseJSONWithJSONObject(strSupportSize);
-
+                mFormatsBean = FormatsBean.convertFromJsonStr(jsonStr);
+                return mFormatsBean;
             } catch (final Exception e) {
-            } finally {
-                return strSupportSize;
+                return null;
             }
         }
-
-        return "";
+        return null;
     }
 
-    private void parseJSONWithJSONObject(String jsonData) {
-        try {
-            JSONObject json = new JSONObject(jsonData);
-            JSONArray jsonArray = json.getJSONArray("formats");
-            for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                String index = jsonObject.getString("index");
-                String type = jsonObject.getString("type");
-                String guidFormat = jsonObject.getString("guidFormat");
-                String sizeV = jsonObject.getString("size");
 
-                Log.d(TAG, "index is " + index);
-                Log.d(TAG, "type is " + type);
-                Log.d(TAG, "guidFormat is " + guidFormat);
-                Log.d(TAG, "size is " + sizeV);
-
-                JSONArray sizeArray = jsonObject.getJSONArray("size");
-                for (int m = 0; m < sizeArray.length(); m++) {
-                    JSONObject value = sizeArray.getJSONObject(m);
-                    //获取到title值
-                    String size = value.getString("size");
-                    Log.d(TAG, "size is " + size);
-                    // String title = value.optString("title");
-
-                }
-
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
 }

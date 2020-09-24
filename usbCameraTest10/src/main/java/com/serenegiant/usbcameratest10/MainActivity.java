@@ -23,6 +23,7 @@
 
 package com.serenegiant.usbcameratest10;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
@@ -46,9 +47,14 @@ import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
+import com.serenegiant.usbcameratest10.adapter.CommonSelectAdapter;
 import com.serenegiant.widget.CameraViewInterface;
 import com.usbcamera.android.DeviceListAdapter;
 import com.usbcamera.android.UsbCamera;
+import com.usbcamera.android.bean.FormatBean;
+import com.usbcamera.android.bean.SizeBean;
+
+import java.util.List;
 
 public final class MainActivity extends BaseActivity implements CameraDialog.CameraDialogParent{
 	private static final boolean DEBUG = true;	// TODO set false on release
@@ -99,8 +105,21 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	private UsbCamera mUsbCamera;
 	private Button mStartBtn;
 	private Button mStopBtn;
+
 	private Spinner mDevSpinner;
 	private DeviceListAdapter mDeviceListAdapter;
+
+
+	private Spinner mFormatSpinner;
+	private CommonSelectAdapter mFormatListAdapter;
+
+	private Spinner mSizeSpinner;
+	private CommonSelectAdapter mSizeListAdapter;
+
+	private Spinner mFpsSpinner;
+	private CommonSelectAdapter mFpsListAdapter;
+
+
 
 	@Override
 	protected void onCreate(final Bundle savedInstanceState) {
@@ -115,11 +134,11 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		final View view = findViewById(R.id.camera_view);
 		view.setOnLongClickListener(mOnLongClickListener);
 		mUVCCameraView = (CameraViewInterface)view;
-		mUVCCameraView.setAspectRatio(PREVIEW_WIDTH / (float)PREVIEW_HEIGHT);
+//		mUVCCameraView.setAspectRatio(PREVIEW_WIDTH / (float)PREVIEW_HEIGHT);
 
 		mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
-		mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
-			2, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_MODE);
+//		mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
+//			2, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_MODE);
 
 		//开始按钮
 		mStartBtn = (Button) findViewById(R.id.start_btn);
@@ -129,17 +148,29 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		mStopBtn = (Button) findViewById(R.id.stop_btn);
 		mStopBtn.setOnClickListener(mOnClickListener);
 
+		final View empty = findViewById(android.R.id.empty);
 		//设备列表
 		mDevSpinner = (Spinner)findViewById(R.id.dev_spinner);
-		final View empty = findViewById(android.R.id.empty);
 		mDevSpinner.setEmptyView(empty);
+
+		//视频格式列表
+		mFormatSpinner = (Spinner)findViewById(R.id.format_spinner);
+		mFormatSpinner.setEmptyView(empty);
+
+		//分辨率列表
+		mSizeSpinner = (Spinner)findViewById(R.id.size_spinner);
+		mSizeSpinner.setEmptyView(empty);
+
+		//帧率
+		mFpsSpinner = (Spinner)findViewById(R.id.fps_spinner);
+		mFpsSpinner.setEmptyView(empty);
 
 		//初始化USBCamera
 		mUsbCamera = new UsbCamera();
 		mUsbCamera.initSDK(this, mUSBMonitor, mCameraHandler);
-
-
 	}
+
+	public Context getActivity(){return this;}
 
 	@Override
 	protected void onStart() {
@@ -156,31 +187,26 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		mDeviceListAdapter = mUsbCamera.getmDeviceListAdapter();
 		mDevSpinner.setAdapter(mDeviceListAdapter);
 
-		//设备列表选择
+		//设备列表选择响应
 		mDevSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				// TODO
-				//Toast.makeText(MainActivity.this,"pos:" + pos + " id:" + id, Toast.LENGTH_SHORT).show();
 				int index = (int)id;
-
 				//动态申请设备权限
 				mUsbCamera.requestPermission(index);
+				//读取视频格式
+				mUsbCamera.getSupportSize(index);
 
-				//获取设备视频格式和分辨率
-				String strSupportSize = mUsbCamera.getSupportSize(index);
-				if (DEBUG) Log.i(TAG, "supportedSize:" + strSupportSize );
-
-				Toast.makeText(MainActivity.this, "supportedSize:" + strSupportSize, Toast.LENGTH_LONG).show();
-
-
+				//初始化 视频格式列表
+				//（1）初始化视频格式列表
+				//（2）通过指定视频格式选中项初始化分别率列表
+				//（3）通过指定分辨率列表选中项初始化帧率列表
+				initFormatSpinner();
 
 			}
 
 			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-				// TODO
-			}
+			public void onNothingSelected(AdapterView<?> parent) { }
 		});
 	}
 
@@ -236,6 +262,22 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 				//开始预览
 				final Object item = mDevSpinner.getSelectedItem();
 				if (item instanceof UsbDevice) {
+
+					int formatId = (int)mFormatSpinner.getSelectedItemId();
+					int sizeId = (int)mSizeSpinner.getSelectedItemId();
+					int fpsId = (int)mFpsSpinner.getSelectedItemId();
+
+					FormatBean formatBean =  (FormatBean)mUsbCamera.getmFormatsBean().getFormats().get(formatId);
+					SizeBean sizeBean = (SizeBean)mUsbCamera.getmFormatsBean().getFormats().get(formatId).getSizeList().get(sizeId);
+
+					int width = sizeBean.getWidth();
+					int height = sizeBean.getHeight();
+					int previewMode = formatBean.getPreviewMode();
+
+					mUVCCameraView.setAspectRatio((float)width / (float)height);
+					mCameraHandler = UVCCameraHandler.createHandler(MainActivity.this, mUVCCameraView,
+							2, width, height, previewMode);
+
 					//打开设备
 					mUSBMonitor.usbCamera_processConnect((UsbDevice)item);
 				}
@@ -342,6 +384,8 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		@Override
 		public void onConnect(final UsbDevice device, final UsbControlBlock ctrlBlock, final boolean createNew) {
 			if (DEBUG) Log.v(TAG, "onConnect:");
+
+
 			mCameraHandler.open(ctrlBlock);
 			startPreview();
 		}
@@ -378,6 +422,70 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		if (canceled) {
 			setCameraButton(false);
 		}
+	}
+
+	/**
+	 * 初始化 视频格式列表
+	 * （1）初始化视频格式列表
+	 * （2）通过指定视频格式选中项初始化分别率列表
+	 * （3）通过指定分辨率列表选中项初始化帧率列表
+	 */
+	private void initFormatSpinner(){
+		int devId = (int)mDevSpinner.getSelectedItemId();
+
+		List<String> formatList = mUsbCamera.getmFormatsBean().getFormatStrList();
+		mFormatListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, formatList.toArray(new String[formatList.size()]));
+		mFormatSpinner.setAdapter(mFormatListAdapter);
+
+		//视频格式列表选择响应
+		mFormatSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				//初始化分辨率类别
+				initSizeSpinner();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) { }
+		});
+
+		mFormatSpinner.setSelection(0);
+	}
+
+	/**
+	 * 初始化 分辨率列表
+	 * （1）初始化分别率列表
+	 * （2）通过指定分辨率列表选中项初始化帧率列表
+	 */
+	private void initSizeSpinner(){
+		int formatId = (int)mFormatSpinner.getSelectedItemId();
+
+		List<String> sizeList = mUsbCamera.getmFormatsBean().getSizeStrList(formatId);
+		mSizeListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, sizeList.toArray(new String[sizeList.size()]));
+		mSizeSpinner.setAdapter(mSizeListAdapter);
+
+		mSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				//初始化Fps
+				initFpsSpinner();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) { }
+		});
+	}
+
+	/**
+	 * 初始化 帧率列表
+	 */
+	private void initFpsSpinner(){
+		int formatId = (int)mFormatSpinner.getSelectedItemId();
+
+		int sizeId = (int)mSizeSpinner.getSelectedItemId();
+		List<String> fpsList = mUsbCamera.getmFormatsBean().getFpsStrList(formatId,sizeId);
+		mFpsListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, fpsList.toArray(new String[fpsList.size()]));
+		mFpsSpinner.setAdapter(mFpsListAdapter);
 	}
 
 

@@ -257,6 +257,8 @@ static jint nativeSetPreviewSize(JNIEnv *env, jobject thiz,
 	ENTER();
 	LOGH_BEGIN();
 
+	LOGH_PRINT("width:%d height:%d min_fps:%d max_fps:%d mode:%d", width, height, min_fps, max_fps, mode);
+
 	UVCCamera *camera = reinterpret_cast<UVCCamera *>(id_camera);
 	if (LIKELY(camera)) {
         LOGH_END();
