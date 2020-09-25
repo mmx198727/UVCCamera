@@ -34,14 +34,11 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.serenegiant.common.BaseActivity;
-import com.serenegiant.usb.CameraDialog;
 import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
@@ -49,14 +46,14 @@ import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.usbcameratest10.adapter.CommonSelectAdapter;
 import com.serenegiant.widget.CameraViewInterface;
-import com.usbcamera.android.DeviceListAdapter;
 import com.usbcamera.android.UsbCamera;
+import com.usbcamera.android.UsbDeviceUtil;
 import com.usbcamera.android.bean.FormatBean;
 import com.usbcamera.android.bean.SizeBean;
 
 import java.util.List;
 
-public final class MainActivity extends BaseActivity implements CameraDialog.CameraDialogParent{
+public final class MainActivity extends BaseActivity{
 	private static final boolean DEBUG = true;	// TODO set false on release
 	private static final String TAG = "MainActivity";
 
@@ -84,6 +81,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	 * for accessing USB
 	 */
 	private USBMonitor mUSBMonitor;
+
 	/**
 	 * Handler to execute camera releated methods sequentially on private thread
 	 */
@@ -92,22 +90,21 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	 * for camera preview display
 	 */
 	private CameraViewInterface mUVCCameraView;
-	/**
-	 * for open&start / stop&close camera preview
-	 */
-	private ToggleButton mCameraButton;
+
 	/**
 	 * button for start/stop recording
 	 */
 	private ImageButton mCaptureButton;
 
-
+	private UsbDeviceUtil mUsbDeviceUtil;
 	private UsbCamera mUsbCamera;
+
+
 	private Button mStartBtn;
 	private Button mStopBtn;
 
 	private Spinner mDevSpinner;
-	private DeviceListAdapter mDeviceListAdapter;
+	private CommonSelectAdapter mDeviceListAdapter;
 
 
 	private Spinner mFormatSpinner;
@@ -126,15 +123,17 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		super.onCreate(savedInstanceState);
 		if (DEBUG) Log.v(TAG, "onCreate:");
 		setContentView(R.layout.activity_main);
-		mCameraButton = (ToggleButton)findViewById(R.id.camera_button);
-		mCameraButton.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
 		mCaptureButton = (ImageButton)findViewById(R.id.capture_button);
 		mCaptureButton.setOnClickListener(mOnClickListener);
 		mCaptureButton.setVisibility(View.INVISIBLE);
 		final View view = findViewById(R.id.camera_view);
 		view.setOnLongClickListener(mOnLongClickListener);
+
 		mUVCCameraView = (CameraViewInterface)view;
 		mUVCCameraView.setAspectRatio(PREVIEW_WIDTH / (float)PREVIEW_HEIGHT);
+
+		mUsbDeviceUtil = new UsbDeviceUtil(this);
 
 		mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
 //		mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
@@ -167,7 +166,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 
 		//初始化USBCamera
 		mUsbCamera = new UsbCamera();
-		mUsbCamera.initSDK(this, mUSBMonitor, mCameraHandler);
+		//mUsbCamera.initSDK(this, mUSBMonitor, mCameraHandler);
 	}
 
 	public Context getActivity(){return this;}
@@ -176,39 +175,35 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	protected void onStart() {
 		super.onStart();
 		if (DEBUG) Log.v(TAG, "onStart:");
-		mUSBMonitor.register();
+		//mUSBMonitor.register();
+		mUsbDeviceUtil.register(new UsbDeviceUtil.OnDeviceChangedListener() {
+			@Override
+			public void onChanged(boolean bAttached, int nDevCount) {
+				if(bAttached){
+					Toast.makeText(getActivity(),"when device attached", Toast.LENGTH_SHORT).show();
+				}else{
+					Toast.makeText(getActivity(),"when device removed", Toast.LENGTH_SHORT).show();
+				}
+
+				//如果设备数量 大于 0 则，初始化设备列表
+				if(nDevCount > 0){
+					//涉及到UI需要操作UI线程
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							//初始化设备列表
+							initDevList();
+						}
+					});
+				}
+			}
+		});
+
 		if (mUVCCameraView != null)
 			mUVCCameraView.onResume();
-
-		//初始化设备列表
-		mUsbCamera.initDevs();
-
-		//绑定设备列表
-		mDeviceListAdapter = mUsbCamera.getmDeviceListAdapter();
-		mDevSpinner.setAdapter(mDeviceListAdapter);
-
-		//设备列表选择响应
-		mDevSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-				int index = (int)id;
-				//动态申请设备权限
-				mUsbCamera.requestPermission(index);
-				//读取视频格式
-				mUsbCamera.getSupportSize(index);
-
-				//初始化 视频格式列表
-				//（1）初始化视频格式列表
-				//（2）通过指定视频格式选中项初始化分别率列表
-				//（3）通过指定分辨率列表选中项初始化帧率列表
-				initFormatSpinner();
-
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) { }
-		});
 	}
+
+
 
 	@Override
 	protected void onStop() {
@@ -221,9 +216,11 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		}, 0);
 		if (mUVCCameraView != null)
 			mUVCCameraView.onPause();
-		setCameraButton(false);
+
 		mCaptureButton.setVisibility(View.INVISIBLE);
-		mUSBMonitor.unregister();
+		//mUSBMonitor.unregister();
+
+		mUsbDeviceUtil.unregister();
 		super.onStop();
 	}
 
@@ -234,12 +231,18 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 			mCameraHandler.release();
 			mCameraHandler = null;
 		}
-		if (mUSBMonitor != null) {
-			mUSBMonitor.destroy();
-			mUSBMonitor = null;
+//		if (mUSBMonitor != null) {
+//			mUSBMonitor.destroy();
+//			mUSBMonitor = null;
+//		}
+
+		if (mUsbDeviceUtil != null) {
+			mUsbDeviceUtil.destroy();
+			mUsbDeviceUtil = null;
 		}
+
 		mUVCCameraView = null;
-		mCameraButton = null;
+
 		mCaptureButton = null;
 		super.onDestroy();
 	}
@@ -247,7 +250,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	protected void checkPermissionResult(final int requestCode, final String permission, final boolean result) {
 		super.checkPermissionResult(requestCode, permission, result);
 		if (!result && (permission != null)) {
-			setCameraButton(false);
+
 		}
 	}
 
@@ -279,7 +282,7 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 							2, width, height, previewMode);
 
 					//打开设备
-					mUSBMonitor.usbCamera_processConnect((UsbDevice)item);
+					//mUSBMonitor.usbCamera_processConnect((UsbDevice)item);
 				}
 				break;
 			case R.id.stop_btn:
@@ -297,24 +300,6 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 							mCameraHandler.stopRecording();
 						}
 					}
-				}
-				break;
-			}
-		}
-	};
-
-	private final CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener
-		= new CompoundButton.OnCheckedChangeListener() {
-		@Override
-		public void onCheckedChanged(final CompoundButton compoundButton, final boolean isChecked) {
-			switch (compoundButton.getId()) {
-			case R.id.camera_button:
-				if (isChecked && !mCameraHandler.isOpened()) {
-					CameraDialog.showDialog(MainActivity.this);
-				} else {
-					mCameraHandler.close();
-					mCaptureButton.setVisibility(View.INVISIBLE);
-					setCameraButton(false);
 				}
 				break;
 			}
@@ -340,24 +325,6 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 		}
 	};
 
-	private void setCameraButton(final boolean isOn) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				if (mCameraButton != null) {
-					try {
-						mCameraButton.setOnCheckedChangeListener(null);
-						mCameraButton.setChecked(isOn);
-					} finally {
-						mCameraButton.setOnCheckedChangeListener(mOnCheckedChangeListener);
-					}
-				}
-				if (!isOn && (mCaptureButton != null)) {
-					mCaptureButton.setVisibility(View.INVISIBLE);
-				}
-			}
-		}, 0);
-	}
 
 	private Surface mSurface;
 	private void startPreview() {
@@ -378,7 +345,16 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	private final OnDeviceConnectListener mOnDeviceConnectListener = new OnDeviceConnectListener() {
 		@Override
 		public void onAttach(final UsbDevice device) {
-			Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED1", Toast.LENGTH_SHORT).show();
+
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					//初始化设备列表
+					initDevList();
+				}
+			});
+
 		}
 
 		@Override
@@ -395,7 +371,6 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 			if (DEBUG) Log.v(TAG, "onDisconnect:");
 			if (mCameraHandler != null) {
 				mCameraHandler.close();
-				setCameraButton(false);
 			}
 		}
 		@Override
@@ -409,19 +384,38 @@ public final class MainActivity extends BaseActivity implements CameraDialog.Cam
 	};
 
 	/**
-	 * to access from CameraDialog
-	 * @return
+	 * 初始化设备列表
 	 */
-	@Override
-	public USBMonitor getUSBMonitor() {
-		return mUSBMonitor;
-	}
+	private void initDevList(){
 
-	@Override
-	public void onDialogResult(boolean canceled) {
-		if (canceled) {
-			setCameraButton(false);
-		}
+		List<String> devList = mUsbDeviceUtil.getDevStrList();
+
+		mDeviceListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, devList.toArray(new String[devList.size()]));
+		mDevSpinner.setAdapter(mDeviceListAdapter);
+
+		//设备列表选择响应
+		mDevSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+				int index = (int)id;
+
+				List<UsbDevice> list = mUsbDeviceUtil.getDeviceList();
+
+				//动态申请设备权限
+				mUsbDeviceUtil.requestPermission(list.get(index));
+				//读取视频格式
+				//mUsbCamera.getSupportSize(index);
+
+				//初始化 视频格式列表
+				//（1）初始化视频格式列表
+				//（2）通过指定视频格式选中项初始化分别率列表
+				//（3）通过指定分辨率列表选中项初始化帧率列表
+				//initFormatSpinner();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) { }
+		});
 	}
 
 	/**
