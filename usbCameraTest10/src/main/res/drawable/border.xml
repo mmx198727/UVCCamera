@@ -26,7 +26,7 @@
     android:useLevel="false" >
 
     <stroke
-        android:width="3px"
+        android:width="2px"
         android:color="@color/GRAY" />
 
     <!-- <solid android:color="@color/TRANSPARENT" />　 -->

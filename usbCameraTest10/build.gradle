@@ -33,7 +33,7 @@ android {
 	}
 
     defaultConfig {
-        applicationId "com.serenegiant.usbcameratest5"
+        applicationId "com.serenegiant.usbcameratest10"
         minSdkVersion 23
 		targetSdkVersion versionTarget
 		versionCode 8

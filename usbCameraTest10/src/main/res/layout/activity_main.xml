@@ -18,11 +18,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/horizontal_vertical_margin">
             <TextView
                 android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
-                android:text="设备">
+                android:text="设备"
+                android:textSize="@dimen/text_size">
             </TextView>
 
             <Spinner
@@ -37,11 +39,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/horizontal_vertical_margin">
             <TextView
                 android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
-                android:text="视频格式">
+                android:text="视频格式"
+                android:textSize="@dimen/text_size">
             </TextView>
 
             <Spinner
@@ -55,11 +59,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/horizontal_vertical_margin">
             <TextView
                 android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
-                android:text="分辨率">
+                android:text="分辨率"
+                android:textSize="@dimen/text_size">
             </TextView>
 
             <Spinner
@@ -73,11 +79,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/horizontal_vertical_margin">
             <TextView
                 android:layout_width="@dimen/activity_textview_width"
                 android:layout_height="wrap_content"
-                android:text="帧率">
+                android:text="帧率"
+                android:textSize="@dimen/text_size">
             </TextView>
 
             <Spinner
@@ -91,11 +99,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:layout_margin="@dimen/horizontal_vertical_margin">
             <!--开始按钮-->
             <Button
                 android:layout_width="@dimen/activity_button_width"
                 android:layout_height="@dimen/activity_button_height"
+                android:textSize="@dimen/text_size"
                 android:id="@+id/start_btn"
                 android:text="Start"
                 android:layout_margin="2dp"
@@ -105,6 +115,7 @@
             <Button
                 android:layout_width="@dimen/activity_button_width"
                 android:layout_height="@dimen/activity_button_height"
+                android:textSize="@dimen/text_size"
                 android:id="@+id/stop_btn"
                 android:text="Stop"
                 android:layout_margin="2dp"
@@ -121,10 +132,11 @@
         android:layout_weight="1"
         android:background="@color/BLACK">
 
+        <!--视频预览区域-->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
+            <!--视频预览控件-->
             <com.serenegiant.widget.UVCCameraTextureView
                 android:id="@+id/camera_view"
                 android:layout_width="match_parent"
@@ -141,6 +153,7 @@
                 android:layout_alignRight="@+id/camera_view"
                 android:src="@drawable/border" />
 
+            <!--拍照按钮-->
             <ImageButton
                 android:id="@+id/capture_button"
                 android:layout_width="@dimen/button_size"
@@ -151,6 +164,69 @@
                 android:background="@null"
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_camera" />
+
+            <!--亮度对比度-->
+            <RelativeLayout
+                android:id="@+id/tools_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/camera_view"
+                android:layout_alignRight="@id/camera_view"
+                android:layout_alignTop="@id/camera_view">
+
+                <Button
+                    android:id="@+id/brightness_button"
+                    android:layout_width="@dimen/activity_long_button_width"
+                    android:layout_height="@dimen/activity_button_height"
+                    android:textSize="@dimen/text_size"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/horizontal_margin_half"
+                    android:layout_marginTop="@dimen/vertical_margin"
+                    android:text="Brightness"
+                    android:textAllCaps="false"/>
+
+                <Button
+                    android:id="@+id/contrast_button"
+                    android:layout_width="@dimen/activity_long_button_width"
+                    android:layout_height="@dimen/activity_button_height"
+                    android:textSize="@dimen/text_size"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/horizontal_margin_half"
+                    android:layout_marginTop="@dimen/vertical_margin"
+                    android:layout_toRightOf="@+id/brightness_button"
+                    android:text="Contrast"
+                    android:textAllCaps="false"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/value_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_alignLeft="@id/camera_view"
+                android:layout_alignRight="@id/camera_view"
+                android:background="#22ffffff"
+                android:visibility="invisible">
+
+                <ImageButton
+                    android:id="@+id/reset_button"
+                    android:layout_width="@dimen/sz_icon_camera_ctrl"
+                    android:layout_height="@dimen/sz_icon_camera_ctrl"
+                    android:background="@null"
+                    android:scaleType="fitXY"
+                    android:src="@mipmap/ic_launcher"/>
+
+                <SeekBar
+                    android:id="@+id/setting_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toRightOf="@+id/reset_button"
+                    android:max="100"
+                    android:progress="50"/>
+            </RelativeLayout>
 
         </RelativeLayout>
 

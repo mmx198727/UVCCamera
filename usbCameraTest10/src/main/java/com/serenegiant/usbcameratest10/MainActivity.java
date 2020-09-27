@@ -539,12 +539,15 @@ public final class MainActivity extends BaseActivity{
 	 * （2）通过指定分辨率列表选中项初始化帧率列表
 	 */
 	private void initSizeSpinner(){
+		//获取视频格式编号
 		int formatId = (int)mFormatSpinner.getSelectedItemId();
 
+		//初始化分辨率列表
 		List<String> sizeList = mFormatsBean.getSizeStrList(formatId);
 		mSizeListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, sizeList.toArray(new String[sizeList.size()]));
 		mSizeSpinner.setAdapter(mSizeListAdapter);
 
+		//分辨率列表选择响应
 		mSizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
