@@ -86,6 +86,10 @@ public class UsbDeviceUtil {
 
     }
 
+    public interface OnDeviceStateChangedListener {
+
+    }
+
     /**
      * 构造函数
      * @param context

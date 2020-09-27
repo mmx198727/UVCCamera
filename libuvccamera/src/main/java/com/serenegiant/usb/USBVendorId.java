@@ -26,7 +26,9 @@ package com.serenegiant.usb;
 import android.util.SparseArray;
 
 /**
- *
+ * USB 设备信息
+ * @apiNote 在USBMonitor.updateDeviceInfo()中使用
+ * @see USBMonitor
  */
 public class USBVendorId {
 	private static final SparseArray<String> IDS = new SparseArray<String>();

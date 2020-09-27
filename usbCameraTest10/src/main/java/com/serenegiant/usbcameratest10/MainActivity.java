@@ -39,16 +39,16 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.serenegiant.common.BaseActivity;
+import com.serenegiant.usb.DeviceFilter;
 import com.serenegiant.usb.USBMonitor;
-import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener;
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.usbcameratest10.adapter.CommonSelectAdapter;
 import com.serenegiant.widget.CameraViewInterface;
-import com.usbcamera.android.UsbCamera;
-import com.usbcamera.android.UsbDeviceUtil;
 import com.usbcamera.android.bean.FormatBean;
+import com.usbcamera.android.bean.FormatsBean;
+import com.usbcamera.android.bean.FpsBean;
 import com.usbcamera.android.bean.SizeBean;
 
 import java.util.List;
@@ -96,8 +96,7 @@ public final class MainActivity extends BaseActivity{
 	 */
 	private ImageButton mCaptureButton;
 
-	private UsbDeviceUtil mUsbDeviceUtil;
-	private UsbCamera mUsbCamera;
+	//private UsbCamera mUsbCamera;
 
 
 	private Button mStartBtn;
@@ -133,11 +132,20 @@ public final class MainActivity extends BaseActivity{
 		mUVCCameraView = (CameraViewInterface)view;
 		mUVCCameraView.setAspectRatio(PREVIEW_WIDTH / (float)PREVIEW_HEIGHT);
 
-		mUsbDeviceUtil = new UsbDeviceUtil(this);
+		//mUsbDeviceUtil = new UsbDeviceUtil(this);
 
-		mUSBMonitor = new USBMonitor(this, mOnDeviceConnectListener);
-//		mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
-//			2, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_MODE);
+		//创建 USBMonitor
+		// （1）监听热插拔 mOnDeviceChangedListener
+		// （2）监听设备连接过程 mOnDeviceConnectListener
+		mUSBMonitor = new USBMonitor(this, mOnDeviceChangedListener, mOnDeviceConnectListener);
+
+		//设置 USB设备过滤器（只选择摄像头）
+		final List<DeviceFilter> filters = DeviceFilter.getDeviceFilters(this, R.xml.device_filter);
+		mUSBMonitor.setDeviceFilter(filters);
+
+		//创建 CameraHandler
+		mCameraHandler = UVCCameraHandler.createHandler(this, mUVCCameraView,
+			2, PREVIEW_WIDTH, PREVIEW_HEIGHT, PREVIEW_MODE);
 
 		//开始按钮
 		mStartBtn = (Button) findViewById(R.id.start_btn);
@@ -163,10 +171,6 @@ public final class MainActivity extends BaseActivity{
 		//帧率
 		mFpsSpinner = (Spinner)findViewById(R.id.fps_spinner);
 		mFpsSpinner.setEmptyView(empty);
-
-		//初始化USBCamera
-		mUsbCamera = new UsbCamera();
-		//mUsbCamera.initSDK(this, mUSBMonitor, mCameraHandler);
 	}
 
 	public Context getActivity(){return this;}
@@ -175,29 +179,7 @@ public final class MainActivity extends BaseActivity{
 	protected void onStart() {
 		super.onStart();
 		if (DEBUG) Log.v(TAG, "onStart:");
-		//mUSBMonitor.register();
-		mUsbDeviceUtil.register(new UsbDeviceUtil.OnDeviceChangedListener() {
-			@Override
-			public void onChanged(boolean bAttached, int nDevCount) {
-				if(bAttached){
-					Toast.makeText(getActivity(),"when device attached", Toast.LENGTH_SHORT).show();
-				}else{
-					Toast.makeText(getActivity(),"when device removed", Toast.LENGTH_SHORT).show();
-				}
-
-				//如果设备数量 大于 0 则，初始化设备列表
-				if(nDevCount > 0){
-					//涉及到UI需要操作UI线程
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							//初始化设备列表
-							initDevList();
-						}
-					});
-				}
-			}
-		});
+		mUSBMonitor.register();
 
 		if (mUVCCameraView != null)
 			mUVCCameraView.onResume();
@@ -208,19 +190,21 @@ public final class MainActivity extends BaseActivity{
 	@Override
 	protected void onStop() {
 		if (DEBUG) Log.v(TAG, "onStop:");
+
+		mUSBMonitor.unregister();
+
 		queueEvent(new Runnable() {
 			@Override
 			public void run() {
 				mCameraHandler.close();
 			}
 		}, 0);
+
 		if (mUVCCameraView != null)
 			mUVCCameraView.onPause();
 
 		mCaptureButton.setVisibility(View.INVISIBLE);
-		//mUSBMonitor.unregister();
-
-		mUsbDeviceUtil.unregister();
+		
 		super.onStop();
 	}
 
@@ -231,14 +215,9 @@ public final class MainActivity extends BaseActivity{
 			mCameraHandler.release();
 			mCameraHandler = null;
 		}
-//		if (mUSBMonitor != null) {
-//			mUSBMonitor.destroy();
-//			mUSBMonitor = null;
-//		}
-
-		if (mUsbDeviceUtil != null) {
-			mUsbDeviceUtil.destroy();
-			mUsbDeviceUtil = null;
+		if (mUSBMonitor != null) {
+			mUSBMonitor.destroy();
+			mUSBMonitor = null;
 		}
 
 		mUVCCameraView = null;
@@ -261,52 +240,55 @@ public final class MainActivity extends BaseActivity{
 		@Override
 		public void onClick(final View view) {
 			switch (view.getId()) {
-			case R.id.start_btn:
+			case R.id.start_btn: {
 				//开始预览
-				final Object item = mDevSpinner.getSelectedItem();
-				if (item instanceof UsbDevice) {
+				int devId = (int) mDevSpinner.getSelectedItemId();
+				int formatId = (int) mFormatSpinner.getSelectedItemId();
+				int sizeId = (int) mSizeSpinner.getSelectedItemId();
+				int fpsId = (int) mFpsSpinner.getSelectedItemId();
 
-					int formatId = (int)mFormatSpinner.getSelectedItemId();
-					int sizeId = (int)mSizeSpinner.getSelectedItemId();
-					int fpsId = (int)mFpsSpinner.getSelectedItemId();
+				FormatBean formatBean = (FormatBean) mFormatsBean.getFormats().get(formatId);
+				SizeBean sizeBean = (SizeBean) mFormatsBean.getFormats().get(formatId).getSizeList().get(sizeId);
+				FpsBean fpsBean = (FpsBean) mFormatsBean.getFormats().get(formatId).getSizeList().get(sizeId).getFpsList().get(fpsId);
 
-					FormatBean formatBean =  (FormatBean)mUsbCamera.getmFormatsBean().getFormats().get(formatId);
-					SizeBean sizeBean = (SizeBean)mUsbCamera.getmFormatsBean().getFormats().get(formatId).getSizeList().get(sizeId);
+				int width = sizeBean.getWidth();
+				int height = sizeBean.getHeight();
+				int previewMode = formatBean.getPreviewMode();
+				int fps = fpsBean.getFps();
 
-					int width = sizeBean.getWidth();
-					int height = sizeBean.getHeight();
-					int previewMode = formatBean.getPreviewMode();
+				mUVCCameraView.setAspectRatio((float) width / (float) height);
+				mCameraHandler = UVCCameraHandler.createHandler(MainActivity.this, mUVCCameraView,
+						2, width, height, previewMode, fps, fps);
 
-					mUVCCameraView.setAspectRatio((float)width / (float)height);
-					mCameraHandler = UVCCameraHandler.createHandler(MainActivity.this, mUVCCameraView,
-							2, width, height, previewMode);
-
-					//打开设备
-					//mUSBMonitor.usbCamera_processConnect((UsbDevice)item);
-				}
+				//打开设备
+				mUSBMonitor.processConnect(mUSBMonitor.getUsbDevice(devId));
 				break;
-			case R.id.stop_btn:
+			}
+			case R.id.stop_btn: {
 				//结束预览
 				mCameraHandler.close();
 				break;
-			case R.id.capture_button:
+			}
+			case R.id.capture_button: {
 				if (mCameraHandler.isOpened()) {
 					if (checkPermissionWriteExternalStorage() && checkPermissionAudio()) {
 						if (!mCameraHandler.isRecording()) {
-							mCaptureButton.setColorFilter(0xffff0000);	// turn red
+							mCaptureButton.setColorFilter(0xffff0000);    // turn red
 							mCameraHandler.startRecording();
 						} else {
-							mCaptureButton.setColorFilter(0);	// return to default color
+							mCaptureButton.setColorFilter(0);    // return to default color
 							mCameraHandler.stopRecording();
 						}
 					}
 				}
 				break;
 			}
+		  }
 		}
 	};
 
 	/**
+	 * 长按屏幕进行拍照
 	 * capture still image when you long click on preview image(not on buttons)
 	 */
 	private final OnLongClickListener mOnLongClickListener = new OnLongClickListener() {
@@ -342,25 +324,61 @@ public final class MainActivity extends BaseActivity{
 		});
 	}
 
-	private final OnDeviceConnectListener mOnDeviceConnectListener = new OnDeviceConnectListener() {
+	private  final USBMonitor.OnDeviceChangedListener mOnDeviceChangedListener = new USBMonitor.OnDeviceChangedListener() {
+		@Override
+		public void onChanged(boolean bAttached, int nDevCount) {
+			if(bAttached){
+				Toast.makeText(getActivity(),"when device attached", Toast.LENGTH_SHORT).show();
+			}else{
+				Toast.makeText(getActivity(),"when device removed", Toast.LENGTH_SHORT).show();
+			}
+
+			//如果设备数量 大于 0 则，初始化设备列表
+			if(nDevCount > 0){
+				//涉及到UI需要操作UI线程
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						//初始化设备列表
+						initDevList();
+					}
+				});
+			}
+		}
+	};
+
+	FormatsBean mFormatsBean;
+	private final USBMonitor.OnDeviceConnectListener2 mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener2() {
 		@Override
 		public void onAttach(final UsbDevice device) {
-			Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED1", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
+		}
 
-			runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					//初始化设备列表
-					initDevList();
-				}
-			});
+		@Override
+		public void onPermisson(final UsbDevice device, boolean hasPermisson) {
+			//申请用户权限结果
+			//Toast.makeText(getActivity(),"onPermisson:" + hasPermisson, Toast.LENGTH_SHORT).show();
+			if(hasPermisson == true){
 
+				USBMonitor.UsbControlBlock ctrlBlock = new USBMonitor.UsbControlBlock(mUSBMonitor, device);
+
+                final UVCCamera camera = new UVCCamera();
+                camera.open(ctrlBlock);
+                String jsonStr = camera.getSupportedSize();
+                camera.close();
+
+                mFormatsBean = FormatsBean.convertFromJsonStr(jsonStr);
+				initFormatSpinner();
+
+			} else {
+				Toast.makeText(getActivity(),"用户没有同意给予权限，因此无法使用。", Toast.LENGTH_SHORT).show();
+			}
 		}
 
 		@Override
 		public void onConnect(final UsbDevice device, final UsbControlBlock ctrlBlock, final boolean createNew) {
 			if (DEBUG) Log.v(TAG, "onConnect:");
-
+			Toast.makeText(getActivity(),"onConnect",Toast.LENGTH_SHORT).show();
 
 			mCameraHandler.open(ctrlBlock);
 			startPreview();
@@ -388,7 +406,8 @@ public final class MainActivity extends BaseActivity{
 	 */
 	private void initDevList(){
 
-		List<String> devList = mUsbDeviceUtil.getDevStrList();
+		//List<String> devList = mUsbDeviceUtil.getDevStrList();
+		List<String> devList = mUSBMonitor.getDevStrList();
 
 		mDeviceListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, devList.toArray(new String[devList.size()]));
 		mDevSpinner.setAdapter(mDeviceListAdapter);
@@ -399,10 +418,13 @@ public final class MainActivity extends BaseActivity{
 			public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 				int index = (int)id;
 
-				List<UsbDevice> list = mUsbDeviceUtil.getDeviceList();
-
 				//动态申请设备权限
-				mUsbDeviceUtil.requestPermission(list.get(index));
+				List<UsbDevice> list = mUSBMonitor.getDeviceList();
+				mUSBMonitor.requestPermission(list.get(index));
+
+//				List<UsbDevice> list = mUsbDeviceUtil.getDeviceList();
+//				mUsbDeviceUtil.requestPermission(list.get(index));
+
 				//读取视频格式
 				//mUsbCamera.getSupportSize(index);
 
@@ -427,7 +449,7 @@ public final class MainActivity extends BaseActivity{
 	private void initFormatSpinner(){
 		int devId = (int)mDevSpinner.getSelectedItemId();
 
-		List<String> formatList = mUsbCamera.getmFormatsBean().getFormatStrList();
+		List<String> formatList = mFormatsBean.getFormatStrList();
 		mFormatListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, formatList.toArray(new String[formatList.size()]));
 		mFormatSpinner.setAdapter(mFormatListAdapter);
 
@@ -454,7 +476,7 @@ public final class MainActivity extends BaseActivity{
 	private void initSizeSpinner(){
 		int formatId = (int)mFormatSpinner.getSelectedItemId();
 
-		List<String> sizeList = mUsbCamera.getmFormatsBean().getSizeStrList(formatId);
+		List<String> sizeList = mFormatsBean.getSizeStrList(formatId);
 		mSizeListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, sizeList.toArray(new String[sizeList.size()]));
 		mSizeSpinner.setAdapter(mSizeListAdapter);
 
@@ -477,7 +499,7 @@ public final class MainActivity extends BaseActivity{
 		int formatId = (int)mFormatSpinner.getSelectedItemId();
 
 		int sizeId = (int)mSizeSpinner.getSelectedItemId();
-		List<String> fpsList = mUsbCamera.getmFormatsBean().getFpsStrList(formatId,sizeId);
+		List<String> fpsList = mFormatsBean.getFpsStrList(formatId,sizeId);
 		mFpsListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, fpsList.toArray(new String[fpsList.size()]));
 		mFpsSpinner.setAdapter(mFpsListAdapter);
 	}

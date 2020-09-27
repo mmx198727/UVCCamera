@@ -703,7 +703,7 @@ abstract class AbstractUVCCameraHandler extends Handler {
 		 * mPreviewMode 视频格式 either UVCCamera.FRAME_FORMAT_YUYV(0) or UVCCamera.FRAME_FORMAT_MJPEG(1)
 		 * 在构造函数赋值
 		 */
-		private int mWidth, mHeight, mPreviewMode;
+		private int mWidth, mHeight, mPreviewMode, mFpsMin, mFpsMax;
 
 		/**
 		 * UVCCamera
@@ -771,6 +771,28 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			mEncoderType = encoderType;
 			mWidth = width;
 			mHeight = height;
+			mFpsMin = 1;
+			mFpsMax = 30;
+			mPreviewMode = format;
+			mBandwidthFactor = bandwidthFactor;
+			mWeakParent = new WeakReference<Activity>(parent);
+			mWeakCameraView = new WeakReference<CameraViewInterface>(cameraView);
+			//加载音频
+			loadShutterSound(parent);
+		}
+
+		CameraThread(final Class<? extends AbstractUVCCameraHandler> clazz,
+					 final Activity parent, final CameraViewInterface cameraView,
+					 final int encoderType, final int width, final int height, final int format,
+					 final float bandwidthFactor, final int fpsMin, final int fpsMax) {
+
+			super("CameraThread");
+			mHandlerClass = clazz;
+			mEncoderType = encoderType;
+			mWidth = width;
+			mHeight = height;
+			mFpsMin = fpsMin;
+			mFpsMax = fpsMax;
 			mPreviewMode = format;
 			mBandwidthFactor = bandwidthFactor;
 			mWeakParent = new WeakReference<Activity>(parent);
@@ -911,11 +933,11 @@ abstract class AbstractUVCCameraHandler extends Handler {
 			if (DEBUG) Log.v(TAG_THREAD, "handleStartPreview:");
 			if ((mUVCCamera == null) || mIsPreviewing) return;
 			try {
-				mUVCCamera.setPreviewSize(mWidth, mHeight, 1, 31, mPreviewMode, mBandwidthFactor);
+				mUVCCamera.setPreviewSize(mWidth, mHeight, mFpsMin, mFpsMax, mPreviewMode, mBandwidthFactor);
 			} catch (final IllegalArgumentException e) {
 				try {
 					// fallback to YUV mode
-					mUVCCamera.setPreviewSize(mWidth, mHeight, 1, 31, UVCCamera.DEFAULT_PREVIEW_MODE, mBandwidthFactor);
+					mUVCCamera.setPreviewSize(mWidth, mHeight, mFpsMin, mFpsMax, UVCCamera.DEFAULT_PREVIEW_MODE, mBandwidthFactor);
 				} catch (final IllegalArgumentException e1) {
 					callOnError(e1);
 					return;

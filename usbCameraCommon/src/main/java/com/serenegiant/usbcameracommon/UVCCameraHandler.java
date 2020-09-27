@@ -121,6 +121,15 @@ public class UVCCameraHandler extends AbstractUVCCameraHandler {
 		return (UVCCameraHandler)thread.getHandler();
 	}
 
+	public static final UVCCameraHandler createHandler(
+			final Activity parent, final CameraViewInterface cameraView,
+			final int encoderType, final int width, final int height, final int format, final int fpsMin,  final int fpsMax) {
+
+		final CameraThread thread = new CameraThread(UVCCameraHandler.class, parent, cameraView, encoderType, width, height, format, UVCCamera.DEFAULT_BANDWIDTH, fpsMin, fpsMax);
+		thread.start();
+		return (UVCCameraHandler)thread.getHandler();
+	}
+
 	protected UVCCameraHandler(final CameraThread thread) {
 		super(thread);
 	}

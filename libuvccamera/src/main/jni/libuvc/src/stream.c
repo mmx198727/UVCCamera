@@ -410,7 +410,7 @@ static uvc_error_t _prepare_stream_ctrl(uvc_device_handle_t *devh, uvc_stream_ct
 static uvc_error_t _uvc_get_stream_ctrl_format(uvc_device_handle_t *devh,
 	uvc_streaming_interface_t *stream_if, uvc_stream_ctrl_t *ctrl, uvc_format_desc_t *format,
 	const int width, const int height,
-	 int min_fps,  int max_fps) {
+	const int min_fps, const int max_fps) {
 
 	ENTER();
 
@@ -465,8 +465,11 @@ static uvc_error_t _uvc_get_stream_ctrl_format(uvc_device_handle_t *devh,
 
 		uint32_t *interval;
 
-        min_fps = 30;
-        max_fps = 30;
+		//此处设置帧率肯定生效
+		//Max 2020-9-27 14:54:23
+        //min_fps = 5;
+        //max_fps = 5;
+
         LOGH_PRINT("minfps:%d maxfps:%d", min_fps,max_fps);
 
 		if (frame->intervals) {
@@ -557,11 +560,11 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 	uvc_format_desc_t *format;
 	DL_FOREACH(devh->info->stream_ifs, stream_if)
 	{
-		DL_FOREACH(stream_if->format_descs, format)
-		{
-			//输出视频格式
-			LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
-		}
+//		DL_FOREACH(stream_if->format_descs, format)
+//		{
+//			//输出视频格式
+//			LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
+//		}
 
 		DL_FOREACH(stream_if->format_descs, format)
 		{

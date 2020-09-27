@@ -28,6 +28,9 @@ import android.os.Parcelable;
 
 import java.util.Locale;
 
+/**
+* 分辨率
+*/
 public class Size implements Parcelable {
 	//
 	/**

@@ -405,7 +405,7 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 					sprintf(guidFormat, "%c%c%c%c", fmt_desc->guidFormat[0],fmt_desc->guidFormat[1],fmt_desc->guidFormat[2],fmt_desc->guidFormat[3]);
 
 				    //输出视频格式
-					LOGH_PRINT("bDescriptorSubtype:%x, guidFormat:%s",fmt_desc->bDescriptorSubtype, guidFormat)
+					//LOGH_PRINT("bDescriptorSubtype:%x, guidFormat:%s",fmt_desc->bDescriptorSubtype, guidFormat)
 
 					writer.StartObject();
 					{
@@ -427,7 +427,7 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 									{
 										write(writer, "width", frame_desc->wWidth);
 										write(writer, "height", frame_desc->wHeight);
-										LOGH_PRINT("size:%dx%d",frame_desc->wWidth, frame_desc->wHeight);
+										//LOGH_PRINT("size:%dx%d",frame_desc->wWidth, frame_desc->wHeight);
 
 										writer.String("fpsList");
 										writer.StartArray();
@@ -437,7 +437,7 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 												for (interval = frame_desc->intervals; *interval; ++interval) {
 													if (UNLIKELY(!(*interval))) continue;
 													uint32_t it = 10000000 / *interval;
-													LOGH_PRINT("fps:%d", it);
+													//LOGH_PRINT("fps:%d", it);
 													writer.StartObject();
 													{
 														write(writer, "fps", it);
