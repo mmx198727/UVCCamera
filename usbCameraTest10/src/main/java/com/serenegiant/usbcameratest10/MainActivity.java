@@ -96,7 +96,16 @@ public final class MainActivity extends BaseActivity{
 	 */
 	private ImageButton mCaptureButton;
 
-	//private UsbCamera mUsbCamera;
+	/**
+	 * 摄像头视频格式对象
+	 * （1）视频格式列表
+	 * （2）分辨率列表（包含在视频格式中）
+	 * （3）帧率列表（包含在分辨率中）
+	 * 选中设备后会刷新
+	 * Todo
+	 * 考虑移动到libuvccamera
+	 */
+	FormatsBean mFormatsBean;
 
 
 	private Button mStartBtn;
@@ -173,8 +182,6 @@ public final class MainActivity extends BaseActivity{
 		mFpsSpinner.setEmptyView(empty);
 	}
 
-	public Context getActivity(){return this;}
-
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -184,8 +191,6 @@ public final class MainActivity extends BaseActivity{
 		if (mUVCCameraView != null)
 			mUVCCameraView.onResume();
 	}
-
-
 
 	@Override
 	protected void onStop() {
@@ -204,13 +209,14 @@ public final class MainActivity extends BaseActivity{
 			mUVCCameraView.onPause();
 
 		mCaptureButton.setVisibility(View.INVISIBLE);
-		
+
 		super.onStop();
 	}
 
 	@Override
 	public void onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:");
+
 		if (mCameraHandler != null) {
 			mCameraHandler.release();
 			mCameraHandler = null;
@@ -219,21 +225,23 @@ public final class MainActivity extends BaseActivity{
 			mUSBMonitor.destroy();
 			mUSBMonitor = null;
 		}
-
 		mUVCCameraView = null;
 
 		mCaptureButton = null;
 		super.onDestroy();
 	}
 
-	protected void checkPermissionResult(final int requestCode, final String permission, final boolean result) {
-		super.checkPermissionResult(requestCode, permission, result);
-		if (!result && (permission != null)) {
-
-		}
-	}
+	/**
+	 * 获取全局Activity对象
+	 * @return
+	 */
+	public Context getActivity(){return this;}
 
 	/**
+	 * 按钮点击响应
+	 * （1）Start：开始预览
+	 * （2）Stop：结束预览
+	 * （3）Capture：录像/停止录像
 	 * event handler when click camera / capture button
 	 */
 	private final OnClickListener mOnClickListener = new OnClickListener() {
@@ -308,7 +316,14 @@ public final class MainActivity extends BaseActivity{
 	};
 
 
+	/**
+	 * 预览对象 Surface
+	 */
 	private Surface mSurface;
+
+	/**
+	 * 开始预览
+	 */
 	private void startPreview() {
 		final SurfaceTexture st = mUVCCameraView.getSurfaceTexture();
 		if (mSurface != null) {
@@ -324,6 +339,11 @@ public final class MainActivity extends BaseActivity{
 		});
 	}
 
+
+	/**
+	 * USB设备变更监听
+	 * （1）onChanged
+	 */
 	private  final USBMonitor.OnDeviceChangedListener mOnDeviceChangedListener = new USBMonitor.OnDeviceChangedListener() {
 		@Override
 		public void onChanged(boolean bAttached, int nDevCount) {
@@ -333,8 +353,17 @@ public final class MainActivity extends BaseActivity{
 				Toast.makeText(getActivity(),"when device removed", Toast.LENGTH_SHORT).show();
 			}
 
-			//如果设备数量 大于 0 则，初始化设备列表
 			if(nDevCount > 0){
+				//如果设备数量 大于 0 则，初始化设备列表
+
+				//如果有设备在使用，则先关闭设备
+				if (mCameraHandler != null) {
+					mCameraHandler.release();
+					mCameraHandler = null;
+				}
+
+				mCaptureButton.setVisibility(View.INVISIBLE);
+
 				//涉及到UI需要操作UI线程
 				runOnUiThread(new Runnable() {
 					@Override
@@ -343,14 +372,34 @@ public final class MainActivity extends BaseActivity{
 						initDevList();
 					}
 				});
+			} else {
+				//如果设备数量 等于于 0 则，清空列表
+				final View empty = findViewById(android.R.id.empty);
+				//设备列表
+				mDevSpinner.setEmptyView(empty);
+				//视频格式列表
+				mFormatSpinner.setEmptyView(empty);
+				//分辨率列表
+				mSizeSpinner.setEmptyView(empty);
+				//帧率
+				mFpsSpinner.setEmptyView(empty);
 			}
 		}
 	};
 
-	FormatsBean mFormatsBean;
+	/**
+	 * USB设备连接状态变更监听
+	 * （1）onAttach
+	 * （2）onPermisson
+	 * （3）onConnect
+	 * （4）onDisconnect
+	 * （5）onDettach
+	 * （6）onCancel
+	 */
 	private final USBMonitor.OnDeviceConnectListener2 mOnDeviceConnectListener = new USBMonitor.OnDeviceConnectListener2() {
 		@Override
 		public void onAttach(final UsbDevice device) {
+			//设备插入
 			//Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
 		}
 
@@ -377,6 +426,8 @@ public final class MainActivity extends BaseActivity{
 
 		@Override
 		public void onConnect(final UsbDevice device, final UsbControlBlock ctrlBlock, final boolean createNew) {
+			//设备连接
+
 			if (DEBUG) Log.v(TAG, "onConnect:");
 			Toast.makeText(getActivity(),"onConnect",Toast.LENGTH_SHORT).show();
 
@@ -386,6 +437,8 @@ public final class MainActivity extends BaseActivity{
 
 		@Override
 		public void onDisconnect(final UsbDevice device, final UsbControlBlock ctrlBlock) {
+			//设备断开连接
+
 			if (DEBUG) Log.v(TAG, "onDisconnect:");
 			if (mCameraHandler != null) {
 				mCameraHandler.close();
@@ -393,11 +446,15 @@ public final class MainActivity extends BaseActivity{
 		}
 		@Override
 		public void onDettach(final UsbDevice device) {
+			//设备拔出
+
 			Toast.makeText(MainActivity.this, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
 		public void onCancel(final UsbDevice device) {
+			//设备取消？
+			Toast.makeText(getActivity(),"onCancel",Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -447,8 +504,7 @@ public final class MainActivity extends BaseActivity{
 	 * （3）通过指定分辨率列表选中项初始化帧率列表
 	 */
 	private void initFormatSpinner(){
-		int devId = (int)mDevSpinner.getSelectedItemId();
-
+		//初始化视频格式列表
 		List<String> formatList = mFormatsBean.getFormatStrList();
 		mFormatListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, formatList.toArray(new String[formatList.size()]));
 		mFormatSpinner.setAdapter(mFormatListAdapter);
@@ -465,7 +521,16 @@ public final class MainActivity extends BaseActivity{
 			public void onNothingSelected(AdapterView<?> parent) { }
 		});
 
-		mFormatSpinner.setSelection(0);
+		//默认选择MJPG
+		int index = 0;
+		for(int n = 0 ; n < formatList.size(); n ++) {
+			String format = formatList.get(n);
+			if(format.toUpperCase().equals("MJPG")){
+				index = n;
+				break;
+			}
+		}
+		mFormatSpinner.setSelection(index);
 	}
 
 	/**
@@ -490,6 +555,24 @@ public final class MainActivity extends BaseActivity{
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) { }
 		});
+
+		//默认选择最大分辨率
+		int sizeIndex = 0;
+		int size = 0;
+		for(int n = 0 ; n < sizeList.size(); n ++) {
+			String sizeStr = sizeList.get(n);
+			String[] sizeArr = sizeStr.split("x");
+			if(sizeArr.length == 2){
+				int width = Integer.parseInt(sizeArr[0]);
+				int height = Integer.parseInt(sizeArr[1]);
+				int sizeTmp = width * height;
+				if(sizeTmp > size){
+					size = sizeTmp;
+					sizeIndex = n;
+				}
+			}
+		}
+		mSizeSpinner.setSelection(sizeIndex);
 	}
 
 	/**
@@ -503,6 +586,8 @@ public final class MainActivity extends BaseActivity{
 		mFpsListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, fpsList.toArray(new String[fpsList.size()]));
 		mFpsSpinner.setAdapter(mFpsListAdapter);
 	}
+
+
 
 
 
