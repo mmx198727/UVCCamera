@@ -23,10 +23,12 @@
 
 package com.serenegiant.usbcameratest10;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
@@ -35,6 +37,7 @@ import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 import com.serenegiant.usb.UVCCamera;
 import com.serenegiant.usbcameracommon.UVCCameraHandler;
 import com.serenegiant.usbcameratest10.adapter.CommonSelectAdapter;
+import com.serenegiant.utils.ViewAnimationHelper;
 import com.serenegiant.widget.CameraViewInterface;
 import com.usbcamera.android.bean.FormatBean;
 import com.usbcamera.android.bean.FormatsBean;
@@ -105,8 +109,7 @@ public final class MainActivity extends BaseActivity{
 	 * Todo
 	 * 考虑移动到libuvccamera
 	 */
-	FormatsBean mFormatsBean;
-
+	private FormatsBean mFormatsBean;
 
 	private Button mStartBtn;
 	private Button mStopBtn;
@@ -123,6 +126,12 @@ public final class MainActivity extends BaseActivity{
 
 	private Spinner mFpsSpinner;
 	private CommonSelectAdapter mFpsListAdapter;
+
+	private View mBrightnessButton, mContrastButton;
+	private View mResetButton;
+	private View mToolsLayout, mValueLayout;
+	private SeekBar mSettingSeekbar;
+	protected static final int SETTINGS_HIDE_DELAY_MS = 2500;
 
 
 
@@ -180,6 +189,20 @@ public final class MainActivity extends BaseActivity{
 		//帧率
 		mFpsSpinner = (Spinner)findViewById(R.id.fps_spinner);
 		mFpsSpinner.setEmptyView(empty);
+
+		mBrightnessButton = findViewById(R.id.brightness_button);
+		mBrightnessButton.setOnClickListener(mOnClickListener);
+		mContrastButton = findViewById(R.id.contrast_button);
+		mContrastButton.setOnClickListener(mOnClickListener);
+		mResetButton = findViewById(R.id.reset_button);
+		mResetButton.setOnClickListener(mOnClickListener);
+		mSettingSeekbar = (SeekBar)findViewById(R.id.setting_seekbar);
+		mSettingSeekbar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
+
+		mToolsLayout = findViewById(R.id.tools_layout);
+		mToolsLayout.setVisibility(View.INVISIBLE);
+		mValueLayout = findViewById(R.id.value_layout);
+		mValueLayout.setVisibility(View.INVISIBLE);
 	}
 
 	@Override
@@ -207,8 +230,6 @@ public final class MainActivity extends BaseActivity{
 
 		if (mUVCCameraView != null)
 			mUVCCameraView.onPause();
-
-		mCaptureButton.setVisibility(View.INVISIBLE);
 
 		super.onStop();
 	}
@@ -275,6 +296,7 @@ public final class MainActivity extends BaseActivity{
 			case R.id.stop_btn: {
 				//结束预览
 				mCameraHandler.close();
+				stopPreview();
 				break;
 			}
 			case R.id.capture_button: {
@@ -291,6 +313,15 @@ public final class MainActivity extends BaseActivity{
 				}
 				break;
 			}
+			case R.id.brightness_button:
+				showSettings(UVCCamera.PU_BRIGHTNESS);
+				break;
+			case R.id.contrast_button:
+				showSettings(UVCCamera.PU_CONTRAST);
+				break;
+			case R.id.reset_button:
+				resetSettings();
+				break;
 		  }
 		}
 	};
@@ -315,6 +346,180 @@ public final class MainActivity extends BaseActivity{
 		}
 	};
 
+	//region 亮度对比度
+	private boolean isActive() {
+		return mCameraHandler != null && mCameraHandler.isOpened();
+	}
+
+	private boolean checkSupportFlag(final int flag) {
+		return mCameraHandler != null && mCameraHandler.checkSupportFlag(flag);
+	}
+
+	private int getValue(final int flag) {
+		return mCameraHandler != null ? mCameraHandler.getValue(flag) : 0;
+	}
+
+	private int setValue(final int flag, final int value) {
+		return mCameraHandler != null ? mCameraHandler.setValue(flag, value) : 0;
+	}
+
+	private int resetValue(final int flag) {
+		return mCameraHandler != null ? mCameraHandler.resetValue(flag) : 0;
+	}
+
+	private void updateItems() {
+		runOnUiThread(mUpdateItemsOnUITask, 100);
+	}
+
+	private final Runnable mUpdateItemsOnUITask = new Runnable() {
+		@Override
+		public void run() {
+			if (isFinishing()) return;
+			final int visible_active = isActive() ? View.VISIBLE : View.INVISIBLE;
+			mToolsLayout.setVisibility(visible_active);
+			mBrightnessButton.setVisibility(
+					checkSupportFlag(UVCCamera.PU_BRIGHTNESS)
+							? visible_active : View.INVISIBLE);
+			mContrastButton.setVisibility(
+					checkSupportFlag(UVCCamera.PU_CONTRAST)
+							? visible_active : View.INVISIBLE);
+		}
+	};
+
+	private int mSettingMode = -1;
+	/**
+	 * 設定画面を表示
+	 * @param mode
+	 */
+	private final void showSettings(final int mode) {
+		if (DEBUG) Log.v(TAG, String.format("showSettings:%08x", mode));
+		hideSetting(false);
+		if (isActive()) {
+			switch (mode) {
+				case UVCCamera.PU_BRIGHTNESS:
+				case UVCCamera.PU_CONTRAST:
+					mSettingMode = mode;
+					mSettingSeekbar.setProgress(getValue(mode));
+					ViewAnimationHelper.fadeIn(mValueLayout, -1, 0, mViewAnimationListener);
+					break;
+			}
+		}
+	}
+
+	private void resetSettings() {
+		if (isActive()) {
+			switch (mSettingMode) {
+				case UVCCamera.PU_BRIGHTNESS:
+				case UVCCamera.PU_CONTRAST:
+					mSettingSeekbar.setProgress(resetValue(mSettingMode));
+					break;
+			}
+		}
+		mSettingMode = -1;
+		ViewAnimationHelper.fadeOut(mValueLayout, -1, 0, mViewAnimationListener);
+	}
+
+	/**
+	 * 設定画面を非表示にする
+	 * @param fadeOut trueならばフェードアウトさせる, falseなら即座に非表示にする
+	 */
+	protected final void hideSetting(final boolean fadeOut) {
+		removeFromUiThread(mSettingHideTask);
+		if (fadeOut) {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					ViewAnimationHelper.fadeOut(mValueLayout, -1, 0, mViewAnimationListener);
+				}
+			}, 0);
+		} else {
+			try {
+				mValueLayout.setVisibility(View.GONE);
+			} catch (final Exception e) {
+				// ignore
+			}
+			mSettingMode = -1;
+		}
+	}
+
+	protected final Runnable mSettingHideTask = new Runnable() {
+		@Override
+		public void run() {
+			hideSetting(true);
+		}
+	};
+
+	/**
+	 * 設定値変更用のシークバーのコールバックリスナー
+	 */
+	private final SeekBar.OnSeekBarChangeListener mOnSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
+		@Override
+		public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
+			// 設定が変更された時はシークバーの非表示までの時間を延長する
+			if (fromUser) {
+				runOnUiThread(mSettingHideTask, SETTINGS_HIDE_DELAY_MS);
+			}
+		}
+
+		@Override
+		public void onStartTrackingTouch(final SeekBar seekBar) {
+		}
+
+		@Override
+		public void onStopTrackingTouch(final SeekBar seekBar) {
+			// シークバーにタッチして値を変更した時はonProgressChangedへ
+			// 行かないみたいなのでここでも非表示までの時間を延長する
+			runOnUiThread(mSettingHideTask, SETTINGS_HIDE_DELAY_MS);
+			if (isActive() && checkSupportFlag(mSettingMode)) {
+				switch (mSettingMode) {
+					case UVCCamera.PU_BRIGHTNESS:
+					case UVCCamera.PU_CONTRAST:
+						setValue(mSettingMode, seekBar.getProgress());
+						break;
+				}
+			}	// if (active)
+		}
+	};
+
+	private final ViewAnimationHelper.ViewAnimationListener
+			mViewAnimationListener = new ViewAnimationHelper.ViewAnimationListener() {
+		@Override
+		public void onAnimationStart(@NonNull final Animator animator, @NonNull final View target, final int animationType) {
+//			if (DEBUG) Log.v(TAG, "onAnimationStart:");
+		}
+
+		@Override
+		public void onAnimationEnd(@NonNull final Animator animator, @NonNull final View target, final int animationType) {
+			final int id = target.getId();
+			switch (animationType) {
+				case ViewAnimationHelper.ANIMATION_FADE_IN:
+				case ViewAnimationHelper.ANIMATION_FADE_OUT:
+				{
+					final boolean fadeIn = animationType == ViewAnimationHelper.ANIMATION_FADE_IN;
+					if (id == R.id.value_layout) {
+						if (fadeIn) {
+							runOnUiThread(mSettingHideTask, SETTINGS_HIDE_DELAY_MS);
+						} else {
+							mValueLayout.setVisibility(View.GONE);
+							mSettingMode = -1;
+						}
+					} else if (!fadeIn) {
+//					target.setVisibility(View.GONE);
+					}
+					break;
+				}
+			}
+		}
+
+		@Override
+		public void onAnimationCancel(@NonNull final Animator animator, @NonNull final View target, final int animationType) {
+//			if (DEBUG) Log.v(TAG, "onAnimationStart:");
+		}
+	};
+
+	//endregion 亮度对比度
+
+
 
 	/**
 	 * 预览对象 Surface
@@ -331,12 +536,17 @@ public final class MainActivity extends BaseActivity{
 		}
 		mSurface = new Surface(st);
 		mCameraHandler.startPreview(mSurface);
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mCaptureButton.setVisibility(View.VISIBLE);
-			}
-		});
+
+		//显示预览后可以使用的按钮
+		setPreviewButton(true);
+	}
+
+	/**
+	 * 停止预览
+	 */
+	private void stopPreview() {
+		//隐藏预览后可以使用的按钮
+		setPreviewButton(false);
 	}
 
 
@@ -427,10 +637,8 @@ public final class MainActivity extends BaseActivity{
 		@Override
 		public void onConnect(final UsbDevice device, final UsbControlBlock ctrlBlock, final boolean createNew) {
 			//设备连接
-
 			if (DEBUG) Log.v(TAG, "onConnect:");
-			Toast.makeText(getActivity(),"onConnect",Toast.LENGTH_SHORT).show();
-
+			//Toast.makeText(getActivity(),"onConnect",Toast.LENGTH_SHORT).show();
 			mCameraHandler.open(ctrlBlock);
 			startPreview();
 		}
@@ -443,6 +651,7 @@ public final class MainActivity extends BaseActivity{
 			if (mCameraHandler != null) {
 				mCameraHandler.close();
 			}
+			stopPreview();
 		}
 		@Override
 		public void onDettach(final UsbDevice device) {
@@ -590,7 +799,24 @@ public final class MainActivity extends BaseActivity{
 		mFpsSpinner.setAdapter(mFpsListAdapter);
 	}
 
+	/**
+	 * 有的按钮只有在开启预览后可以使用
+	 * @param isOn
+	 */
+	private void setPreviewButton(final boolean isOn) {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (!isOn) {
+					mCaptureButton.setVisibility(View.INVISIBLE);
 
+				} else {
+					mCaptureButton.setVisibility(View.VISIBLE);
+				}
+				updateItems();
+			}
+		}, 0);
+	}
 
 
 
