@@ -210,21 +210,37 @@ public final class MainActivity extends BaseActivity{
 		super.onStart();
 		if (DEBUG) Log.v(TAG, "onStart:");
 
+		mUSBMonitor.register();
+
+		if (mUVCCameraView != null)
+			mUVCCameraView.onResume();
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		mUSBMonitor.register();
-
 		if (mUVCCameraView != null)
 			mUVCCameraView.onResume();
+
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
+
+		if(mCameraHandler != null && mCameraHandler.isOpened()) {
+			mCameraHandler.close();
+		}
+
+		if (mUVCCameraView != null)
+			mUVCCameraView.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		if (DEBUG) Log.v(TAG, "onStop:");
 
 		mUSBMonitor.unregister();
 
@@ -237,11 +253,6 @@ public final class MainActivity extends BaseActivity{
 
 		if (mUVCCameraView != null)
 			mUVCCameraView.onPause();
-	}
-
-	@Override
-	protected void onStop() {
-		if (DEBUG) Log.v(TAG, "onStop:");
 
 		super.onStop();
 	}
@@ -598,13 +609,13 @@ public final class MainActivity extends BaseActivity{
 				//如果设备数量 等于于 0 则，清空列表
 				final View empty = findViewById(android.R.id.empty);
 				//设备列表
-				mDevSpinner.setEmptyView(empty);
+				mDevSpinner.setAdapter(null);
 				//视频格式列表
-				mFormatSpinner.setEmptyView(empty);
+				mFormatSpinner.setAdapter(null);
 				//分辨率列表
-				mSizeSpinner.setEmptyView(empty);
+				mSizeSpinner.setAdapter(null);
 				//帧率
-				mFpsSpinner.setEmptyView(empty);
+				mFpsSpinner.setAdapter(null);
 			}
 		}
 	};
@@ -622,7 +633,7 @@ public final class MainActivity extends BaseActivity{
 		@Override
 		public void onAttach(final UsbDevice device) {
 			//设备插入
-			//Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(MainActivity.this, "USB_DEVICE_ATTACHED" + device.getProductName(), Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
@@ -658,7 +669,6 @@ public final class MainActivity extends BaseActivity{
 		@Override
 		public void onDisconnect(final UsbDevice device, final UsbControlBlock ctrlBlock) {
 			//设备断开连接
-
 			if (DEBUG) Log.v(TAG, "onDisconnect:");
 			if (mCameraHandler != null) {
 				mCameraHandler.close();
@@ -678,12 +688,15 @@ public final class MainActivity extends BaseActivity{
 		}
 	};
 
+	List<UsbDevice> mUsbDeviceList;
+
 	/**
 	 * 初始化设备列表
 	 */
 	private void initDevList(){
 
 		//List<String> devList = mUsbDeviceUtil.getDevStrList();
+		mUsbDeviceList = mUSBMonitor.getDeviceList();
 		List<String> devList = mUSBMonitor.getDevStrList();
 
 		mDeviceListAdapter = new CommonSelectAdapter(getActivity(), R.layout.select_item, devList.toArray(new String[devList.size()]));
@@ -696,8 +709,7 @@ public final class MainActivity extends BaseActivity{
 				int index = (int)id;
 
 				//动态申请设备权限
-				List<UsbDevice> list = mUSBMonitor.getDeviceList();
-				mUSBMonitor.requestPermission(list.get(index));
+				mUSBMonitor.requestPermission(mUsbDeviceList.get(index));
 
 //				List<UsbDevice> list = mUsbDeviceUtil.getDeviceList();
 //				mUsbDeviceUtil.requestPermission(list.get(index));
