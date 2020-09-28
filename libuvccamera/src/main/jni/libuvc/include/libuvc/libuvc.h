@@ -105,6 +105,11 @@ enum uvc_frame_format {
 	UVC_FRAME_FORMAT_MJPEG,
 	UVC_FRAME_FORMAT_GRAY8,
 	UVC_FRAME_FORMAT_BY8,
+    /** 自定义格式，需要放在最后，只是用于辅助 */
+    UVC_FRAME_FORMAT_H264,
+    UVC_FRAME_FORMAT_H265,
+    UVC_FRAME_FORMAT_NV12,
+    UVC_FRAME_FORMAT_NV21,
 	/** Number of formats understood */
 	UVC_FRAME_FORMAT_COUNT,
 };

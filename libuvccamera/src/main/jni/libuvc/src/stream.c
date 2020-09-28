@@ -550,7 +550,7 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 		int height, int min_fps, int max_fps) {
 	ENTER();
 
-    LOGH_PRINT("width:%d height:%d min_fps:%d max_fps:%d", width, height, min_fps, max_fps);
+    LOGH_PRINT("uvc_frame_format:%d width:%d height:%d min_fps:%d max_fps:%d",cf,  width, height, min_fps, max_fps);
 
 	uvc_streaming_interface_t *stream_if;
 	uvc_error_t result;
@@ -568,7 +568,31 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 
 		DL_FOREACH(stream_if->format_descs, format)
 		{
-			if (!_uvc_frame_format_matches_guid(cf, format->guidFormat))
+            //输出视频格式
+            LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
+
+            char buf[4] = {0};
+            sprintf(buf, "%c%c%c%c", format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3]);
+            switch(cf){
+			case UVC_FRAME_FORMAT_H264:
+				LOGH_PRINT("UVC_FRAME_FORMAT_H264:%d",cf);
+				if(strcmp(buf, "H264")){
+					LOGH_PRINT("found H264");
+					goto found;
+				}
+				break;
+			case UVC_FRAME_FORMAT_H265:
+				LOGH_PRINT("UVC_FRAME_FORMAT_H265:%d",cf);
+				break;
+			case UVC_FRAME_FORMAT_NV12:
+				LOGH_PRINT("UVC_FRAME_FORMAT_NV12:%d",cf);
+				break;
+			case UVC_FRAME_FORMAT_NV21:
+				LOGH_PRINT("UVC_FRAME_FORMAT_NV21:%d",cf);
+				break;
+            };
+
+            if (!_uvc_frame_format_matches_guid(cf, format->guidFormat))
 				continue;
 
 			result = _uvc_get_stream_ctrl_format(devh, stream_if, ctrl, format, width, height, min_fps, max_fps);
