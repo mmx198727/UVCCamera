@@ -209,6 +209,13 @@ public final class MainActivity extends BaseActivity{
 	protected void onStart() {
 		super.onStart();
 		if (DEBUG) Log.v(TAG, "onStart:");
+
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
 		mUSBMonitor.register();
 
 		if (mUVCCameraView != null)
@@ -216,8 +223,8 @@ public final class MainActivity extends BaseActivity{
 	}
 
 	@Override
-	protected void onStop() {
-		if (DEBUG) Log.v(TAG, "onStop:");
+	protected void onPause() {
+		super.onPause();
 
 		mUSBMonitor.unregister();
 
@@ -230,6 +237,11 @@ public final class MainActivity extends BaseActivity{
 
 		if (mUVCCameraView != null)
 			mUVCCameraView.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+		if (DEBUG) Log.v(TAG, "onStop:");
 
 		super.onStop();
 	}
@@ -563,16 +575,16 @@ public final class MainActivity extends BaseActivity{
 				Toast.makeText(getActivity(),"when device removed", Toast.LENGTH_SHORT).show();
 			}
 
+			//如果有设备在使用，则先关闭设备
+			if (mCameraHandler != null && mCameraHandler.isOpened()) {
+				mCameraHandler.close();
+//				mCameraHandler.release();
+//				mCameraHandler = null;
+				stopPreview();
+			}
+
 			if(nDevCount > 0){
 				//如果设备数量 大于 0 则，初始化设备列表
-
-				//如果有设备在使用，则先关闭设备
-				if (mCameraHandler != null) {
-					mCameraHandler.release();
-					mCameraHandler = null;
-				}
-
-				mCaptureButton.setVisibility(View.INVISIBLE);
 
 				//涉及到UI需要操作UI线程
 				runOnUiThread(new Runnable() {
@@ -656,8 +668,7 @@ public final class MainActivity extends BaseActivity{
 		@Override
 		public void onDettach(final UsbDevice device) {
 			//设备拔出
-
-			Toast.makeText(MainActivity.this, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
+			//Toast.makeText(MainActivity.this, "USB_DEVICE_DETACHED", Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
