@@ -167,6 +167,8 @@ static enum uvc_frame_format uvc_frame_format_for_guid(uint8_t guid[16]) {
  */
 uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl, uint8_t probe, enum uvc_req_code req) {
+    LOGH_BEGIN();
+
 	uint8_t buf[48];	// XXX support UVC 1.1 & 1.5
 	size_t len;
 	uvc_error_t err;
@@ -181,8 +183,10 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	else
 		len = 26;
 //	LOGI("bcdUVC:%x,req:0x%02x,probe:%d", bcdUVC, req, probe);
+    LOGH_PRINT("bcdUVC:%x,req:0x%02x,probe:%d", bcdUVC, req, probe);
 	/* prepare for a SET transfer */
 	if (req == UVC_SET_CUR) {
+        LOGH_PRINT("req == UVC_SET_CUR");
 		SHORT_TO_SW(ctrl->bmHint, buf);
 		buf[2] = ctrl->bFormatIndex;
 		buf[3] = ctrl->bFrameIndex;
@@ -195,6 +199,7 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		INT_TO_DW(ctrl->dwMaxVideoFrameSize, buf + 18);
 		INT_TO_DW(ctrl->dwMaxPayloadTransferSize, buf + 22);
 
+        LOGH_PRINT("len:%d",len);
 		if (len > 26) {	// len == 34
 			// XXX add to support UVC 1.1
 			INT_TO_DW(ctrl->dwClockFrequency, buf + 26);
@@ -215,20 +220,24 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	}
 
 	/* do the transfer */
+    LOGH_PRINT("do the transfe");
 	err = libusb_control_transfer(devh->usb_devh,
 			req == UVC_SET_CUR ? 0x21 : 0xA1, req,
 			probe ? (UVC_VS_PROBE_CONTROL << 8) : (UVC_VS_COMMIT_CONTROL << 8),
 			ctrl->bInterfaceNumber, buf, len, 0);
 
 	if (UNLIKELY(err <= 0)) {
+        LOGH_PRINT("err <= 0");
 		// when libusb_control_transfer returned error or transfer bytes was zero.
 		if (!err) {
 			UVC_DEBUG("libusb_control_transfer transfered zero length data");
+			LOGH_PRINT("libusb_control_transfer transfered zero length data");
 			err = UVC_ERROR_OTHER;
 		}
 		return err;
 	}
 	if (err < len) {
+        LOGH_PRINT("transfered bytes is smaller than data bytes:%d expected %d", err, len);
 #if !defined(__LP64__)
 		LOGE("transfered bytes is smaller than data bytes:%d expected %d", err, len);
 #else
@@ -238,6 +247,8 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	}
 	/* now decode following a GET transfer */
 	if (req != UVC_SET_CUR) {
+        LOGH_PRINT("req != UVC_SET_CUR");
+
 		ctrl->bmHint = SW_TO_SHORT(buf);
 		ctrl->bFormatIndex = buf[2];
 		ctrl->bFrameIndex = buf[3];
@@ -280,6 +291,7 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		}
 	}
 
+	LOGH_END();
 	return UVC_SUCCESS;
 }
 
@@ -571,27 +583,6 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
             //输出视频格式
             LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
 
-            char buf[4] = {0};
-            sprintf(buf, "%c%c%c%c", format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3]);
-            switch(cf){
-			case UVC_FRAME_FORMAT_H264:
-				LOGH_PRINT("UVC_FRAME_FORMAT_H264:%d",cf);
-				if(strcmp(buf, "H264")){
-					LOGH_PRINT("found H264");
-					goto found;
-				}
-				break;
-			case UVC_FRAME_FORMAT_H265:
-				LOGH_PRINT("UVC_FRAME_FORMAT_H265:%d",cf);
-				break;
-			case UVC_FRAME_FORMAT_NV12:
-				LOGH_PRINT("UVC_FRAME_FORMAT_NV12:%d",cf);
-				break;
-			case UVC_FRAME_FORMAT_NV21:
-				LOGH_PRINT("UVC_FRAME_FORMAT_NV21:%d",cf);
-				break;
-            };
-
             if (!_uvc_frame_format_matches_guid(cf, format->guidFormat))
 				continue;
 
@@ -617,25 +608,30 @@ found:
 uvc_error_t uvc_probe_stream_ctrl(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl) {
 	uvc_error_t err;
+    LOGH_BEGIN();
 
 	err = uvc_claim_if(devh, ctrl->bInterfaceNumber);
 	if (UNLIKELY(err)) {
 		LOGE("uvc_claim_if:err=%d", err);
+		LOGH_PRINT("uvc_claim_if:err=%d", err);
 		return err;
 	}
 
 	err = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_SET_CUR);	// probe query
 	if (UNLIKELY(err)) {
 		LOGE("uvc_query_stream_ctrl(UVC_SET_CUR):err=%d", err);
+        LOGH_PRINT("uvc_query_stream_ctrl(UVC_SET_CUR):err=%d", err);
 		return err;
 	}
 
 	err = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_GET_CUR);	// probe query ここでエラーが返ってくる
 	if (UNLIKELY(err)) {
 		LOGE("uvc_query_stream_ctrl(UVC_GET_CUR):err=%d", err);
+        LOGH_PRINT("uvc_query_stream_ctrl(UVC_GET_CUR):err=%d", err);
 		return err;
 	}
 
+	LOGH_END();
 	return UVC_SUCCESS;
 }
 

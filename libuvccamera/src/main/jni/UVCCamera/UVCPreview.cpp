@@ -169,46 +169,6 @@ inline const bool UVCPreview::isRunning() const {return mIsRunning; }
 
 #include "Common/loghelper.h"
 
-/**
- * 将setPreviewSize参数mode转换为uvc_frame_format枚举
- * @param mode 视频格式，在UVCCamera.java中定义
- * - FRAME_FORMAT_YUYV  = 0;
- * - FRAME_FORMAT_MJPEG = 1;
- * - FRAME_FORMAT_H264 = 2;
- * - FRAME_FORMAT_H265 = 3;
- * - FRAME_FORMAT_NV12 = 4;
- * - FRAME_FORMAT_NV21 = 5;
- * @return  uvc_frame_format
- * @see uvc_frame_format
- */
-int getFormat(int mode) {
-    int format = UVC_FRAME_FORMAT_MJPEG;
-    switch(mode) {
-        case 0:
-            format = UVC_FRAME_FORMAT_YUYV;
-            break;
-        case 1:
-            format = UVC_FRAME_FORMAT_MJPEG;
-            break;
-        case 2:
-            format = UVC_FRAME_FORMAT_H264;
-            LOGH_PRINT("UVC_FRAME_FORMAT_H264:%d",format);
-            break;
-        case 3:
-            format = UVC_FRAME_FORMAT_H265;
-            LOGH_PRINT("UVC_FRAME_FORMAT_H265:%d",format);
-            break;
-        case 4:
-            format = UVC_FRAME_FORMAT_NV12;
-            LOGH_PRINT("UVC_FRAME_FORMAT_NV12:%d",format);
-        case 5:
-            format = UVC_FRAME_FORMAT_NV21;
-            LOGH_PRINT("UVC_FRAME_FORMAT_NV21:%d",format);
-            break;
-    };
-    return format;
-}
-
 int UVCPreview::setPreviewSize(int width, int height, int min_fps, int max_fps, int mode, float bandwidth) {
 	ENTER();
 
@@ -232,14 +192,9 @@ int UVCPreview::setPreviewSize(int width, int height, int min_fps, int max_fps, 
                 requestBandwidth);
 
 		uvc_stream_ctrl_t ctrl;
-//		result = uvc_get_stream_ctrl_format_size_fps(mDeviceHandle, &ctrl,
-//			!requestMode ? UVC_FRAME_FORMAT_YUYV : UVC_FRAME_FORMAT_MJPEG,
-//			requestWidth, requestHeight, requestMinFps, requestMaxFps);
-
-        result = uvc_get_stream_ctrl_format_size_fps(mDeviceHandle, &ctrl,
-                                                     (uvc_frame_format)getFormat(requestMode),
-             requestWidth, requestHeight, requestMinFps, requestMaxFps);
-
+		result = uvc_get_stream_ctrl_format_size_fps(mDeviceHandle, &ctrl,
+			!requestMode ? UVC_FRAME_FORMAT_YUYV : UVC_FRAME_FORMAT_MJPEG,
+			requestWidth, requestHeight, requestMinFps, requestMaxFps);
 	}
 	
 	RETURN(result, int);

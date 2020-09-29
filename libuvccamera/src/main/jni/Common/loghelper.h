@@ -19,6 +19,7 @@
 #include <android/log.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <string.h>
 
 /** @brief 日志级别定义
  */
