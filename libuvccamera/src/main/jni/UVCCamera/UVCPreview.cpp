@@ -167,13 +167,9 @@ void UVCPreview::clear_pool() {
 
 inline const bool UVCPreview::isRunning() const {return mIsRunning; }
 
-#include "Common/loghelper.h"
-
 int UVCPreview::setPreviewSize(int width, int height, int min_fps, int max_fps, int mode, float bandwidth) {
 	ENTER();
 
-	LOGH_PRINT("mode:%d width:%d height:%d min_fps:%d max_fps:%d mode:%d bandwidth:%d", mode, width, height, min_fps, max_fps, mode, bandwidth);
-	
 	int result = 0;
 	if ((requestWidth != width) || (requestHeight != height) || (requestMode != mode)) {
 		requestWidth = width;
@@ -182,14 +178,6 @@ int UVCPreview::setPreviewSize(int width, int height, int min_fps, int max_fps, 
 		requestMaxFps = max_fps;
 		requestMode = mode;
 		requestBandwidth = bandwidth;
-
-        LOGH_PRINT("requestWidth:%d requestHeight:%d requestMinFps:%d requestMaxFps:%d mode:%d bandwidth:%d",
-                requestWidth,
-                requestHeight,
-                requestMinFps,
-                requestMaxFps,
-                requestMode,
-                requestBandwidth);
 
 		uvc_stream_ctrl_t ctrl;
 		result = uvc_get_stream_ctrl_format_size_fps(mDeviceHandle, &ctrl,
@@ -536,7 +524,6 @@ void UVCPreview::do_preview(uvc_stream_ctrl_t *ctrl) {
 #if LOCAL_DEBUG
 		LOGI("Streaming...");
 #endif
-		LOGH_PRINT("frameMode:%d", frameMode);
 		if (frameMode) {
 			// MJPEG mode
 			for ( ; LIKELY(isRunning()) ; ) {

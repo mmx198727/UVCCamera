@@ -45,8 +45,6 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
-#include "Common/loghelper.h"
-
 /** @internal */
 typedef struct _uvc_error_msg {
 	uvc_error_t err;

@@ -32,6 +32,7 @@ android {
 		targetCompatibility javaTargetCompatibility
 	}
 
+
     defaultConfig {
         applicationId "com.serenegiant.usbcameratest10"
         minSdkVersion 23

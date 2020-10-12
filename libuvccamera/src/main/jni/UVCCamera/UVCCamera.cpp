@@ -48,8 +48,6 @@
 
 #define	LOCAL_DEBUG 0
 
-#include "Common/loghelper.h"
-
 //**********************************************************************
 //
 //**********************************************************************
@@ -138,7 +136,6 @@ void UVCCamera::clearCameraParams() {
  */
 int UVCCamera::connect(int vid, int pid, int fd, int busnum, int devaddr, const char *usbfs) {
 	ENTER();
-	LOGH_BEGIN();
 
 	uvc_error_t result = UVC_ERROR_BUSY;
 	if (!mDeviceHandle && fd) {
@@ -189,7 +186,6 @@ int UVCCamera::connect(int vid, int pid, int fd, int busnum, int devaddr, const 
 		LOGW("camera is already opened. you should release first");
 	}
 
-    LOGH_END();
 	RETURN(result, int);
 
 }
@@ -197,7 +193,6 @@ int UVCCamera::connect(int vid, int pid, int fd, int busnum, int devaddr, const 
 // カメラを開放する
 int UVCCamera::release() {
 	ENTER();
-	LOGH_BEGIN();
 
 	stopPreview();
 	// カメラのclose処理
@@ -226,7 +221,6 @@ int UVCCamera::release() {
 		mUsbFs = NULL;
 	}
 
-	LOGH_END();
 	RETURN(0, int);
 }
 
@@ -259,7 +253,6 @@ char *UVCCamera::getSupportedSize() {
 
 int UVCCamera::setPreviewSize(int width, int height, int min_fps, int max_fps, int mode, float bandwidth) {
 	ENTER();
-	LOGH_PRINT("width:%d height:%d min_fps:%d max_fps:%d mode:%d bandwidth:%d", width, height, min_fps, max_fps, mode, bandwidth);
 
 	int result = EXIT_FAILURE;
 	if (mPreview) {

@@ -29,8 +29,6 @@
 #include "rapidjson/writer.h"
 #include "libuvc/libuvc_internal.h"
 
-#include "./Common/loghelper.h"
-
 using namespace rapidjson;
 
 static void write(Writer<StringBuffer> &writer, const char *key, const char *value) {
@@ -64,7 +62,6 @@ static void write(Writer<StringBuffer> &writer, const char *key, uint64_t value)
 }
 
 static const char *_uvc_name_for_format_subtype(uint8_t subtype) {
-	LOGOUTD("_uvc_name_for_format_subtype()");
 	switch (subtype) {
 	case UVC_VS_FORMAT_UNCOMPRESSED:
 		return "UncompressedFormat";
@@ -131,7 +128,6 @@ static const char *_uvc_name_for_format_subtype(uint8_t subtype) {
 #define FRAME_INTERVAL_STEP			"frameIntervalStep"
 
 static void writerFormat(Writer<StringBuffer> &writer, uvc_format_desc_t *fmt_desc) {
-	LOGOUTD("writerFormat()");
 	uvc_frame_desc_t *frame_desc;
 	char work[256];
 
@@ -225,7 +221,6 @@ static void writerFormat(Writer<StringBuffer> &writer, uvc_format_desc_t *fmt_de
 }
 
 static void writerFormatDescriptions(Writer<StringBuffer> &writer, uvc_streaming_interface_t *stream_if) {
-	LOGOUTD("writerFormatDescriptions()");
 	uvc_format_desc_t *fmt_desc;
 	int i;
 
@@ -256,7 +251,6 @@ UVCDiags::UVCDiags() {}
 UVCDiags::~UVCDiags() {};
 
 char *UVCDiags::getDescriptions(const uvc_device_handle_t *deviceHandle) {
-	LOGOUTD("getDescriptions()");
 	StringBuffer buffer;
 	Writer<StringBuffer> writer(buffer);
 	char work[256];
@@ -313,7 +307,6 @@ char *UVCDiags::getDescriptions(const uvc_device_handle_t *deviceHandle) {
 				writer.EndObject();	// end of DESC_UVC
 			}
 			// XXX other interfaces
-			LOGOUTD(buffer.GetString());
 		}
 		writer.EndObject();	// end of DESCRIPTION
 	}
@@ -348,7 +341,6 @@ char *UVCDiags::getCurrentStream(const uvc_stream_ctrl_t *ctrl) {
 
 char* getInt(int num){
     ENTER();
-    LOGH_BEGIN();
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -359,7 +351,6 @@ char* getInt(int num){
 
     writer.String(guidFormat);
 
-    LOGH_END();
     RETURN(strdup(buffer.GetString()), char *);
 
     return guidFormat;
@@ -377,8 +368,6 @@ char* getInt(int num){
  * @see uvc_device_handle_t
  */
 char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
-	LOGH_BEGIN();
-
 	StringBuffer buffer;
 	Writer<StringBuffer> writer(buffer);
 	char buf[256];
@@ -462,13 +451,10 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 			}//end formatList
 			writer.EndArray();
 			// FIXME still image is not supported now
-
-			LOGH_PRINT(buffer.GetString());
 		}
 	}
 	writer.EndObject();
 
-    LOGH_END();
 	RETURN(strdup(buffer.GetString()), char *);
 
 }
@@ -482,7 +468,6 @@ char *UVCDiags::getSupportedSize(const uvc_device_handle_t *deviceHandle) {
 char* UVCDiags::getGuidFormat(uvc_format_desc_t *fmt_desc){
 
     ENTER();
-    LOGH_BEGIN();
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -493,7 +478,6 @@ char* UVCDiags::getGuidFormat(uvc_format_desc_t *fmt_desc){
 
     writer.String(guidFormat);
 
-    LOGH_END();
     RETURN(strdup(buffer.GetString()), char *);
 
     return guidFormat;

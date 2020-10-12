@@ -117,7 +117,6 @@ public final class MainActivity extends BaseActivity{
 	private Spinner mDevSpinner;
 	private CommonSelectAdapter mDeviceListAdapter;
 
-
 	private Spinner mFormatSpinner;
 	private CommonSelectAdapter mFormatListAdapter;
 

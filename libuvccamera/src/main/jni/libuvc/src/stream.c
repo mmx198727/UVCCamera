@@ -62,8 +62,6 @@
 #include "libuvc/libuvc.h"
 #include "libuvc/libuvc_internal.h"
 
-#include "Common/loghelper.h"
-
 uvc_frame_desc_t *uvc_find_frame_desc_stream(uvc_stream_handle_t *strmh,
 		uint16_t format_id, uint16_t frame_id);
 uvc_frame_desc_t *uvc_find_frame_desc(uvc_device_handle_t *devh,
@@ -123,7 +121,6 @@ struct format_table_entry *_get_format_entry(enum uvc_frame_format format) {
 
 static uint8_t _uvc_frame_format_matches_guid(enum uvc_frame_format fmt,
 		uint8_t guid[16]) {
-	LOGOUTD("_uvc_frame_format_matches_guid()");
 	struct format_table_entry *format;
 	int child_idx;
 
@@ -143,7 +140,6 @@ static uint8_t _uvc_frame_format_matches_guid(enum uvc_frame_format fmt,
 }
 
 static enum uvc_frame_format uvc_frame_format_for_guid(uint8_t guid[16]) {
-	LOGOUTD("uvc_frame_format_for_guid()");
 	struct format_table_entry *format;
 	enum uvc_frame_format fmt;
 
@@ -167,7 +163,6 @@ static enum uvc_frame_format uvc_frame_format_for_guid(uint8_t guid[16]) {
  */
 uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl, uint8_t probe, enum uvc_req_code req) {
-    LOGH_BEGIN();
 
 	uint8_t buf[48];	// XXX support UVC 1.1 & 1.5
 	size_t len;
@@ -183,10 +178,9 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	else
 		len = 26;
 //	LOGI("bcdUVC:%x,req:0x%02x,probe:%d", bcdUVC, req, probe);
-    LOGH_PRINT("bcdUVC:%x,req:0x%02x,probe:%d", bcdUVC, req, probe);
+
 	/* prepare for a SET transfer */
 	if (req == UVC_SET_CUR) {
-        LOGH_PRINT("req == UVC_SET_CUR");
 		SHORT_TO_SW(ctrl->bmHint, buf);
 		buf[2] = ctrl->bFormatIndex;
 		buf[3] = ctrl->bFrameIndex;
@@ -199,7 +193,6 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		INT_TO_DW(ctrl->dwMaxVideoFrameSize, buf + 18);
 		INT_TO_DW(ctrl->dwMaxPayloadTransferSize, buf + 22);
 
-        LOGH_PRINT("len:%d",len);
 		if (len > 26) {	// len == 34
 			// XXX add to support UVC 1.1
 			INT_TO_DW(ctrl->dwClockFrequency, buf + 26);
@@ -220,24 +213,20 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	}
 
 	/* do the transfer */
-    LOGH_PRINT("do the transfe");
 	err = libusb_control_transfer(devh->usb_devh,
 			req == UVC_SET_CUR ? 0x21 : 0xA1, req,
 			probe ? (UVC_VS_PROBE_CONTROL << 8) : (UVC_VS_COMMIT_CONTROL << 8),
 			ctrl->bInterfaceNumber, buf, len, 0);
 
 	if (UNLIKELY(err <= 0)) {
-        LOGH_PRINT("err <= 0");
 		// when libusb_control_transfer returned error or transfer bytes was zero.
 		if (!err) {
 			UVC_DEBUG("libusb_control_transfer transfered zero length data");
-			LOGH_PRINT("libusb_control_transfer transfered zero length data");
 			err = UVC_ERROR_OTHER;
 		}
 		return err;
 	}
 	if (err < len) {
-        LOGH_PRINT("transfered bytes is smaller than data bytes:%d expected %d", err, len);
 #if !defined(__LP64__)
 		LOGE("transfered bytes is smaller than data bytes:%d expected %d", err, len);
 #else
@@ -247,8 +236,6 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 	}
 	/* now decode following a GET transfer */
 	if (req != UVC_SET_CUR) {
-        LOGH_PRINT("req != UVC_SET_CUR");
-
 		ctrl->bmHint = SW_TO_SHORT(buf);
 		ctrl->bFormatIndex = buf[2];
 		ctrl->bFrameIndex = buf[3];
@@ -291,7 +278,6 @@ uvc_error_t uvc_query_stream_ctrl(uvc_device_handle_t *devh,
 		}
 	}
 
-	LOGH_END();
 	return UVC_SUCCESS;
 }
 
@@ -477,25 +463,16 @@ static uvc_error_t _uvc_get_stream_ctrl_format(uvc_device_handle_t *devh,
 
 		uint32_t *interval;
 
-		//此处设置帧率肯定生效
-		//Max 2020-9-27 14:54:23
-        //min_fps = 5;
-        //max_fps = 5;
-
-        LOGH_PRINT("minfps:%d maxfps:%d", min_fps,max_fps);
-
 		if (frame->intervals) {
 			for (interval = frame->intervals; *interval; ++interval) {
 				if (UNLIKELY(!(*interval))) continue;
 				uint32_t it = 10000000 / *interval;
-                LOGH_PRINT("fps:%d", it);
 				LOGV("it:%d", it);
 				if ((it >= (uint32_t) min_fps) && (it <= (uint32_t) max_fps)) {
 					ctrl->bmHint = (1 << 0); /* don't negotiate interval */
 					ctrl->bFormatIndex = format->bFormatIndex;
 					ctrl->bFrameIndex = frame->bFrameIndex;
 					ctrl->dwFrameInterval = *interval;
-					LOGH_PRINT("use fps:%d", it);
 
 					goto found;
 				}
@@ -562,8 +539,6 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 		int height, int min_fps, int max_fps) {
 	ENTER();
 
-    LOGH_PRINT("uvc_frame_format:%d width:%d height:%d min_fps:%d max_fps:%d",cf,  width, height, min_fps, max_fps);
-
 	uvc_streaming_interface_t *stream_if;
 	uvc_error_t result;
 
@@ -580,9 +555,6 @@ uvc_error_t uvc_get_stream_ctrl_format_size_fps(uvc_device_handle_t *devh,
 
 		DL_FOREACH(stream_if->format_descs, format)
 		{
-            //输出视频格式
-            LOGOUTD("DL_FOREACH(stream_if->format_descs, format() format->guidFormat:%c %c %c %c",format->guidFormat[0],format->guidFormat[1],format->guidFormat[2],format->guidFormat[3])
-
             if (!_uvc_frame_format_matches_guid(cf, format->guidFormat))
 				continue;
 
@@ -608,30 +580,25 @@ found:
 uvc_error_t uvc_probe_stream_ctrl(uvc_device_handle_t *devh,
 		uvc_stream_ctrl_t *ctrl) {
 	uvc_error_t err;
-    LOGH_BEGIN();
 
 	err = uvc_claim_if(devh, ctrl->bInterfaceNumber);
 	if (UNLIKELY(err)) {
 		LOGE("uvc_claim_if:err=%d", err);
-		LOGH_PRINT("uvc_claim_if:err=%d", err);
 		return err;
 	}
 
 	err = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_SET_CUR);	// probe query
 	if (UNLIKELY(err)) {
 		LOGE("uvc_query_stream_ctrl(UVC_SET_CUR):err=%d", err);
-        LOGH_PRINT("uvc_query_stream_ctrl(UVC_SET_CUR):err=%d", err);
 		return err;
 	}
 
 	err = uvc_query_stream_ctrl(devh, ctrl, 1, UVC_GET_CUR);	// probe query ここでエラーが返ってくる
 	if (UNLIKELY(err)) {
 		LOGE("uvc_query_stream_ctrl(UVC_GET_CUR):err=%d", err);
-        LOGH_PRINT("uvc_query_stream_ctrl(UVC_GET_CUR):err=%d", err);
 		return err;
 	}
 
-	LOGH_END();
 	return UVC_SUCCESS;
 }
 
@@ -1418,7 +1385,6 @@ uvc_error_t uvc_stream_start(uvc_stream_handle_t *strmh,
  */
 uvc_error_t uvc_stream_start_bandwidth(uvc_stream_handle_t *strmh,
 		uvc_frame_callback_t *cb, void *user_ptr, float bandwidth_factor, uint8_t flags) {
-	LOGOUTD("uvc_stream_start_bandwidth");
 	/* USB interface we'll be using */
 	const struct libusb_interface *interface;
 	int interface_id;
