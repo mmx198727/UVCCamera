@@ -80,6 +80,11 @@ public final class USBMonitor {
 	private final SparseArray<WeakReference<UsbDevice>> mHasPermissions = new SparseArray<WeakReference<UsbDevice>>();
 
 	private final WeakReference<Context> mWeakContext;
+
+	public UsbManager getmUsbManager() {
+		return mUsbManager;
+	}
+
 	private final UsbManager mUsbManager;
 	/** USB 设备变更回调通知 */
 	private final OnDeviceChangedListener mOnDeviceChangedListener;

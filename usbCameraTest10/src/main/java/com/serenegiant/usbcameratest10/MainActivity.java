@@ -27,8 +27,10 @@ import android.animation.Animator;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
@@ -56,6 +58,7 @@ import com.usbcamera.android.bean.FpsBean;
 import com.usbcamera.android.bean.SizeBean;
 
 import java.util.List;
+import java.util.Locale;
 
 public final class MainActivity extends BaseActivity{
 	private static final boolean DEBUG = true;	// TODO set false on release
@@ -636,20 +639,78 @@ public final class MainActivity extends BaseActivity{
 		}
 
 		@Override
-		public void onPermisson(final UsbDevice device, boolean hasPermisson) {
+		public void onPermisson(final UsbDevice usbDevice, boolean hasPermisson) {
 			//申请用户权限结果
 			//Toast.makeText(getActivity(),"onPermisson:" + hasPermisson, Toast.LENGTH_SHORT).show();
 			if(hasPermisson == true){
 
-				USBMonitor.UsbControlBlock ctrlBlock = new USBMonitor.UsbControlBlock(mUSBMonitor, device);
+//				USBMonitor.UsbControlBlock ctrlBlock = new USBMonitor.UsbControlBlock(mUSBMonitor, device);
+//
+//                final UVCCamera camera = new UVCCamera();
+//                camera.open(ctrlBlock);
+//                String jsonStr = camera.getSupportedSize();
+//                camera.close();
+//
+//                mFormatsBean = FormatsBean.convertFromJsonStr(jsonStr);
+//				initFormatSpinner();
+				UsbDeviceConnection connection = mUSBMonitor.getmUsbManager().openDevice(usbDevice);
+				//add your operation code here
 
-                final UVCCamera camera = new UVCCamera();
-                camera.open(ctrlBlock);
-                String jsonStr = camera.getSupportedSize();
-                camera.close();
+				int venderId =  0;
+				int productId = 0;
+				int fd = 0;
 
-                mFormatsBean = FormatsBean.convertFromJsonStr(jsonStr);
-				initFormatSpinner();
+				String name = usbDevice.getDeviceName();
+				int busnum = 0;
+				int devnum = 0;
+
+				String usbfsName = null;
+
+				if (connection != null) {
+					venderId =  usbDevice.getVendorId();
+					productId = usbDevice.getProductId();
+					fd = connection.getFileDescriptor();
+
+					String[] v = !TextUtils.isEmpty(name) ? name.split("/") : null;
+
+					if (v != null) {
+						busnum = Integer.parseInt(v[v.length-2]);
+						devnum = Integer.parseInt(v[v.length-1]);
+					}
+
+					int desc = connection.getFileDescriptor();
+					byte[] rawDesc = connection.getRawDescriptors();
+					//Log.i(TAG, String.format(Locale.US, "name=%s,desc=%d,busnum=%d,devnum=%d,rawDesc=", name, desc, busnum, devnum) + rawDesc);
+
+					Toast.makeText(MainActivity.this,
+							String.format(Locale.US, "name=%s,desc=%d,busnum=%d,devnum=%d,rawDesc=", name, desc, busnum, devnum) + rawDesc,
+							Toast.LENGTH_LONG).show();
+
+
+					if ((v != null) && (v.length > 2)) {
+						final StringBuilder sb = new StringBuilder(v[0]);
+						for (int i = 1; i < v.length - 2; i++)
+							sb.append("/").append(v[i]);
+						usbfsName = sb.toString();
+					}
+					if (TextUtils.isEmpty(usbfsName)) {
+						Log.w(TAG, "failed to get USBFS path, try to use default path:" + name);
+						usbfsName = "/dev/bus/usb";
+					}
+
+					UVCCamera.testlibuvc(venderId, productId,
+							fd,
+							busnum,
+							devnum,
+							usbfsName);
+
+
+				} else {
+					//Log.e(TAG, "could not connect to device " + name);
+					Toast.makeText(MainActivity.this,
+							"could not connect to device " + name,
+							Toast.LENGTH_LONG).show();
+				}
 
 			} else {
 				Toast.makeText(getActivity(),"用户没有同意给予权限，因此无法使用。", Toast.LENGTH_SHORT).show();

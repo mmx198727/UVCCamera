@@ -23,13 +23,6 @@
 
 package com.serenegiant.usb;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.text.TextUtils;
@@ -38,6 +31,13 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.serenegiant.usb.USBMonitor.UsbControlBlock;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UVCCamera {
 	private static final boolean DEBUG = false;	// TODO set false when releasing
@@ -183,6 +183,10 @@ public class UVCCamera {
     public UVCCamera() {
     	mNativePtr = nativeCreate();
     	mSupportedSize = null;
+	}
+
+	public static void testlibuvc(int venderId, int productId, int fileDescriptor, int busNum, int devAddr, String usbfs) {
+		nativeTest(venderId, productId, fileDescriptor, busNum, devAddr,  usbfs);
 	}
 
     /**
@@ -456,6 +460,10 @@ public class UVCCamera {
     }
 
 //================================================================================
+	public synchronized long getNativePtr() {
+		return mNativePtr;
+	}
+
 	public synchronized void setAutoFocus(final boolean autoFocus) {
     	if (mNativePtr != 0) {
     		nativeSetAutoFocus(mNativePtr, autoFocus);
@@ -1033,6 +1041,7 @@ public class UVCCamera {
 	}
 
     // #nativeCreate and #nativeDestroy are not static methods.
+	private static final native void nativeTest(int venderId, int productId, int fileDescriptor, int busNum, int devAddr, String usbfs);
     private final native long nativeCreate();
     private final native void nativeDestroy(final long id_camera);
 
