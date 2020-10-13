@@ -24,8 +24,11 @@
 apply plugin: 'com.android.application'
 
 android {
-	compileSdkVersion versionCompiler
-	buildToolsVersion versionBuildTool
+//	compileSdkVersion versionCompiler
+//	buildToolsVersion versionBuildTool
+
+	compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
 	compileOptions {
 		sourceCompatibility javaSourceCompatibility

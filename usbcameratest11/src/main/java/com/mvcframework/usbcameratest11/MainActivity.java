@@ -14,7 +14,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.serenegiant.usb.USBMonitor;
 import com.serenegiant.usb.UVCCamera;
 
 import java.util.Locale;
@@ -22,11 +21,6 @@ import java.util.Locale;
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
-
-    /**
-     * for accessing USB
-     */
-    private USBMonitor mUSBMonitor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +31,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-
-        //mUSBMonitor.register();
-
         openUsbDevice();
     }
 
@@ -55,10 +46,10 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onStop() {
-        //mUSBMonitor.unregister();
         super.onStop();
     }
 
+    //region 获得 usb 权限
     /**
      * 获得 usb 权限
      */
@@ -187,4 +178,5 @@ public class MainActivity extends Activity {
             }
         }
     };
+    //endregion
 }
