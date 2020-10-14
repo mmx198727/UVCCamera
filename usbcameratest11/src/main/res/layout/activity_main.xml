@@ -150,8 +150,7 @@
                 android:layout_alignTop="@+id/camera_view"
                 android:layout_alignBottom="@+id/camera_view"
                 android:layout_alignLeft="@+id/camera_view"
-                android:layout_alignRight="@+id/camera_view"
-                android:src="@drawable/border" />
+                android:layout_alignRight="@+id/camera_view" />
 
             <!--拍照按钮-->
             <ImageButton

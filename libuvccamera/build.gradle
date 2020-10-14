@@ -101,5 +101,5 @@ dependencies {
 //	implementation("com.serenegiant:common:${commonLibVersion}") {
 //		exclude module: 'support-v4'
 //	}
-	compile(name: 'common-2.12.4', ext: 'aar')
+	//compile(name: 'common-2.12.4', ext: 'aar')
 }
