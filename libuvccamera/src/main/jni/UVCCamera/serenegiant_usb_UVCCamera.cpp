@@ -37,7 +37,6 @@
 #include <android/native_window_jni.h>
 
 #include "libUVCCamera.h"
-#include "UVCCamera.h"
 
 /**
  * set the value into the long field
