@@ -1,4 +1,7 @@
-# Android build config for libusb, examples and tests
+# modified saki@serenegiant <t_saki@serenegiant.com>
+# Copyright (C)2014-2016
+#
+# Android build config for libusb
 # Copyright © 2012-2013 RealVNC Ltd. <toby.gray@realvnc.com>
 #
 # This library is free software; you can redistribute it and/or
@@ -15,9 +18,59 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 #
+######################################################################
+# libusb.a
+######################################################################
+LOCAL_PATH			:= $(call my-dir)/../..
+include $(CLEAR_VARS)
 
-LOCAL_PATH:= $(call my-dir)
+# changed linux_usbfs.c => android_usbfs.c
+# changed linux_netlink.c => android_netlink.c
+# these sources are also modified.
+LOCAL_SRC_FILES := \
+	libusb/core.c \
+	libusb/descriptor.c \
+	libusb/hotplug.c \
+	libusb/io.c \
+	libusb/sync.c \
+	libusb/strerror.c \
+	libusb/os/android_usbfs.c \
+	libusb/os/poll_posix.c \
+	libusb/os/threads_posix.c \
+	libusb/os/android_netlink.c
 
-include $(LOCAL_PATH)/libusb.mk
-#include $(LOCAL_PATH)/examples.mk
-#include $(LOCAL_PATH)/tests.mk
+LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH)/ \
+	$(LOCAL_PATH)/libusb \
+	$(LOCAL_PATH)/libusb/os \
+	$(LOCAL_PATH)/../ \
+	$(LOCAL_PATH)/../include \
+	$(LOCAL_PATH)/android \
+
+LOCAL_EXPORT_C_INCLUDES := \
+	$(LOCAL_PATH)/ \
+	$(LOCAL_PATH)/libusb
+
+# add some flags
+LOCAL_CFLAGS := $(LOCAL_C_INCLUDES:%=-I%)
+LOCAL_CFLAGS += -DANDROID_NDK
+LOCAL_CFLAGS += -DLOG_NDEBUG
+LOCAL_CFLAGS += -DACCESS_RAW_DESCRIPTORS
+LOCAL_CFLAGS += -O3 -fstrict-aliasing -fprefetch-loop-arrays
+LOCAL_EXPORT_LDLIBS += -llog
+LOCAL_ARM_MODE := arm
+
+LOCAL_MODULE := libusb100_static
+include $(BUILD_STATIC_LIBRARY)
+
+######################################################################
+# libusb100.so
+######################################################################
+include $(CLEAR_VARS)
+LOCAL_MODULE_TAGS := optional
+LOCAL_EXPORT_LDLIBS += -llog
+
+LOCAL_WHOLE_STATIC_LIBRARIES = libusb100_static
+
+LOCAL_MODULE := libusb100
+include $(BUILD_SHARED_LIBRARY)
