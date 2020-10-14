@@ -133,12 +133,12 @@ void cb(uvc_frame_t *frame, void *ptr) {
 	}
 
 	/* Do the BGR conversion */
-	ret = uvc_any2bgr(frame, bgr);
-	if (ret) {
-		uvc_perror(ret, "uvc_any2bgr");
-		uvc_free_frame(bgr);
-		return;
-	}
+//	ret = uvc_any2bgr(frame, bgr);
+//	if (ret) {
+//		uvc_perror(ret, "uvc_any2bgr");
+//		uvc_free_frame(bgr);
+//		return;
+//	}
 
 	/* Call a user function:
      *
