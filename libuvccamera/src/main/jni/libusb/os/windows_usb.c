@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <config.h>
+#include "../config.h"
 #include <windows.h>
 #include <setupapi.h>
 #include <ctype.h>
@@ -34,7 +34,7 @@
 #include <objbase.h>
 #include <winioctl.h>
 
-#include "libusbi.h"
+#include "../libusbi.h"
 #include "poll_windows.h"
 #include "windows_usb.h"
 

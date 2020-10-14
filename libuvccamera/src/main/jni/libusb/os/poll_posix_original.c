@@ -23,7 +23,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include "libusbi.h"
+#include "../libusbi.h"
 
 int usbi_pipe(int pipefd[2])
 {

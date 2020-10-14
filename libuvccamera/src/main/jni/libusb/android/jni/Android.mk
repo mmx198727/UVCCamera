@@ -28,28 +28,26 @@ include $(CLEAR_VARS)
 # changed linux_netlink.c => android_netlink.c
 # these sources are also modified.
 LOCAL_SRC_FILES := \
-	libusb/core.c \
-	libusb/descriptor.c \
-	libusb/hotplug.c \
-	libusb/io.c \
-	libusb/sync.c \
-	libusb/strerror.c \
-	libusb/os/android_usbfs.c \
-	libusb/os/poll_posix.c \
-	libusb/os/threads_posix.c \
-	libusb/os/android_netlink.c
+	core.c \
+	descriptor.c \
+	hotplug.c \
+	io.c \
+	sync.c \
+	strerror.c \
+	os/android_usbfs.c \
+	os/poll_posix.c \
+	os/threads_posix.c \
+	os/android_netlink.c
 
 LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/ \
-	$(LOCAL_PATH)/libusb \
-	$(LOCAL_PATH)/libusb/os \
+	$(LOCAL_PATH)/os \
 	$(LOCAL_PATH)/../ \
 	$(LOCAL_PATH)/../include \
 	$(LOCAL_PATH)/android \
 
 LOCAL_EXPORT_C_INCLUDES := \
 	$(LOCAL_PATH)/ \
-	$(LOCAL_PATH)/libusb
 
 # add some flags
 LOCAL_CFLAGS := $(LOCAL_C_INCLUDES:%=-I%)
