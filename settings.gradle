@@ -21,18 +21,6 @@
  *  may have a different license, see the respective files.
  */
 include ':usbcameratest11'
-include ':usbCameraTest10'
-include ':usbCameratest9'
-include ':usbcameratest9'
 
 include ':libuvccamera'
 include ':usbCameraCommon'
-include ':usbCameraTest'
-include ':usbCameraTest0'
-include ':usbCameraTest2'
-include ':usbCameraTest3'
-include ':usbCameraTest4'
-include ':usbCameraTest5'
-include ':usbCameraTest6'
-include ':usbCameraTest7'
-include ':usbCameraTest8'
