@@ -36,7 +36,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     implementation project(':libuvccamera')
-    implementation project(':usbCameraCommon')
-    implementation 'com.google.code.gson:gson:2.7'
 
 }
