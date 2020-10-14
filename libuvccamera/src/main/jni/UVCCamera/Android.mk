@@ -55,7 +55,6 @@ LOCAL_ARM_MODE := arm
 LOCAL_SRC_FILES := \
 		_onload.cpp \
 		utilbase.cpp \
-		Parameters.cpp \
 		serenegiant_usb_UVCCamera.cpp
 
 LOCAL_MODULE    := UVCCamera
